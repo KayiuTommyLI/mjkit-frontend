@@ -1,6 +1,7 @@
 // src/main.tsx (Expected Structure)
 import React from 'react'
 import ReactDOM from 'react-dom/client'
+import { BrowserRouter } from 'react-router-dom';
 import App from './App.tsx'
 import './style.css'
 
@@ -11,6 +12,8 @@ import '@fontsource/roboto/700.css';
 
 ReactDOM.createRoot(document.getElementById('root')!).render(
   <React.StrictMode>
-    <App />
+    <BrowserRouter> {/* <-- Wrap App with BrowserRouter */}
+      <App />
+    </BrowserRouter>
   </React.StrictMode>,
 )

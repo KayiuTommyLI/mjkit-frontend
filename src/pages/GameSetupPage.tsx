@@ -1,6 +1,8 @@
 import React, { useState, useEffect, ChangeEvent, FormEvent } from 'react';
 import { v4 as uuidv4 } from 'uuid';
 
+import React, { /*...,*/ useNavigate } from 'react-router-dom'; // <-- Import useNavigate
+
 // MUI Imports
 import Box from '@mui/material/Box';
 import Button from '@mui/material/Button';
@@ -58,6 +60,8 @@ const minScoreOptions = Array.from({ length: 5 }, (_, i) => i + 1); // 1 to 5
 
 // --- Component ---
 const GameSetupPage: React.FC = () => {
+    const navigate = useNavigate(); // <-- Get the navigate function
+
     // --- State ---
     const [players, setPlayers] = useState(() =>
         defaultPlayerNames.map((name, index) => ({
@@ -203,8 +207,13 @@ const GameSetupPage: React.FC = () => {
             const createdGame = await response.json();
             console.log('Game created successfully:', createdGame);
             setApiSuccessMessage(`Game created! ID: ${createdGame.game_id}. Redirecting soon...`);
-            // --- TODO: Implement navigation ---
-            // Example: setTimeout(() => navigate(`/game/${createdGame.game_id}`), 1500);
+            
+            // --- REPLACE alert WITH NAVIGATION ---
+            // alert(`Game created! ID: ${createdGame.game_id}`); // Remove or comment out alert
+            // Navigate to the new game page after a short delay (optional)
+            setTimeout(() => {
+              navigate(`/game/${createdGame.game_id}`); // Redirect to game page
+            }, 1500); // 1.5 second delay
 
         } catch (err: any) {
             console.error('Failed to create game:', err);
