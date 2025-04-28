@@ -1,0 +1,23 @@
+{
+  "compilerOptions": {
+    "module": "CommonJS", // Or ESNext if using Vite defaults
+    "jsx": "react-jsx",  // <-- Add or verify this line
+    "declaration": true,
+    "removeComments": true,
+    "emitDecoratorMetadata": true,
+    "experimentalDecorators": true,
+    "allowSyntheticDefaultImports": true,
+    "target": "ES2023", // Or a recent target like ES2020+
+    "sourceMap": true,
+    "outDir": "./dist",
+    "baseUrl": "./",
+    "incremental": true,
+    "skipLibCheck": true,
+    "strictNullChecks": true,
+    "forceConsistentCasingInFileNames": true,
+    "noImplicitAny": false,
+    "strictBindCallApply": false,
+    "noFallthroughCasesInSwitch": false
+     // If using Vite defaults, you might also have moduleResolution: "bundler" or "NodeNext"
+  }
+}
