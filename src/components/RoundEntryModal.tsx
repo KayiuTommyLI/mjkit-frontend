@@ -210,7 +210,7 @@ const RoundEntryModal: React.FC<RoundEntryModalProps> = ({
                             <FormControl fullWidth required={isLoserRequired} margin="dense" disabled={!isLoserRequired || isLoading}>
                                 <InputLabel id="loser-label">Loser</InputLabel>
                                 <Select labelId="loser-label" value={loserId ?? ''} label="Loser" onChange={handleLoserChange} >
-                                     <MenuItem value="" disabled><em>{isLoserRequired ? 'Select Loser' : '(Not Applicable)'}</em></MenuItem>
+                                    <MenuItem value="" disabled><em>{isLoserRequired ? 'Select Loser' : '(Not Applicable)'}</em></MenuItem>
                                     {loserOptions.map(p => (<MenuItem key={p.game_player_id} value={p.game_player_id}>{p.player_name_in_game}</MenuItem>))}
                                 </Select>
                             </FormControl>

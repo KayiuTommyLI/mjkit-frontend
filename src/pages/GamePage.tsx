@@ -19,8 +19,11 @@ import Divider from '@mui/material/Divider';
 import IconButton from '@mui/material/IconButton';
 import ArrowBackIcon from '@mui/icons-material/ArrowBack';
 import PlayCircleOutlineIcon from '@mui/icons-material/PlayCircleOutline';
-import ExpandMoreIcon from '@mui/icons-material/ExpandMore'; // <-- Add import
-import ExpandLessIcon from '@mui/icons-material/ExpandLess'; // <-- Add import
+import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
+import ExpandLessIcon from '@mui/icons-material/ExpandLess';
+import DeleteIcon from '@mui/icons-material/Delete'; // For delete button in table
+
+import ConfirmationDialog from '../components/ConfirmationDialog'; // Import confirmation dialog
 
 // Import the modal and the new table component
 import RoundEntryModal from '../components/RoundEntryModal';
@@ -114,6 +117,13 @@ const GamePage: React.FC = () => {
 
     // State for Master Token presence
     const [hasMasterToken, setHasMasterToken] = useState<boolean>(false);
+
+    // --- NEW: State for Delete Confirmation ---
+    const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState<boolean>(false);
+    const [roundToDelete, setRoundToDelete] = useState<RoundData | null>(null);
+    const [isDeletingRound, setIsDeletingRound] = useState<boolean>(false);
+    const [deleteError, setDeleteError] = useState<string | null>(null);
+    // --- END NEW ---
 
     // Check for Master Token on Load/GameId Change
     useEffect(() => {
@@ -234,6 +244,7 @@ const GamePage: React.FC = () => {
                 setLoadingGame(false); 
                 setLoadingRounds(false); 
             } 
+            setDeleteError(null);
         }
     }, [gameId]); // Dependency array includes gameId
 
@@ -295,6 +306,71 @@ const GamePage: React.FC = () => {
     }, [fetchAllGameData]);
 
 
+    // --- NEW: Delete Round Handlers ---
+    const handleDeleteRoundRequest = useCallback((round: RoundData) => {
+        console.log("Requesting delete for round:", round.round_number);
+        setRoundToDelete(round); // Store the round details
+        setDeleteError(null); // Clear previous delete errors
+        setIsDeleteDialogOpen(true); // Open confirmation dialog
+    }, []); // No dependencies needed as it just sets state
+
+    const handleCloseDeleteDialog = () => {
+        setIsDeleteDialogOpen(false);
+        setRoundToDelete(null); // Clear the round to delete
+    };
+
+    const handleConfirmDelete = useCallback(async () => {
+        if (!roundToDelete || !gameId) {
+            setDeleteError("Cannot delete: Round or Game ID missing.");
+            setIsDeleteDialogOpen(false);
+            return;
+        }
+
+        const gameMasterToken = localStorage.getItem(`gameMasterToken_${gameId}`);
+        if (!gameMasterToken) {
+            setDeleteError("Cannot delete: Game Master Token not found.");
+            setIsDeleteDialogOpen(false);
+            return;
+        }
+
+        setIsDeletingRound(true);
+        setDeleteError(null);
+        console.log(`Attempting to delete round ID: ${roundToDelete.round_id}`);
+
+        try {
+            const response = await fetch(`http://localhost:3000/games/${gameId}/rounds/${roundToDelete.round_id}`, {
+                method: 'DELETE',
+                headers: {
+                    'x-game-master-token': gameMasterToken,
+                },
+            });
+
+            if (!response.ok) {
+                // Status 204 (No Content) is success for DELETE, check for others
+                if (response.status === 204) {
+                     // Success handled in finally block by refreshing data
+                } else {
+                    let errorMsg = `Error deleting round: ${response.status}`;
+                    try { const errorData = await response.json(); errorMsg = errorData.message || JSON.stringify(errorData); }
+                    catch (jsonError) { errorMsg = `${response.status} ${response.statusText}`; }
+                    throw new Error(errorMsg);
+                }
+            }
+             console.log(`Round ${roundToDelete.round_number} deleted successfully.`);
+             // Refresh data after successful deletion
+             await fetchAllGameData(false);
+
+        } catch (err: any) {
+            console.error("Failed to delete round:", err);
+            setDeleteError(err.message || 'Failed to delete round.');
+        } finally {
+            setIsDeletingRound(false);
+            setIsDeleteDialogOpen(false); // Close dialog regardless of success/fail
+            setRoundToDelete(null);
+        }
+    }, [gameId, roundToDelete, fetchAllGameData]); // Dependencies for the handler
+
+
     // --- Render Logic ---
     // Combined initial loading state
     if (loadingGame && !gameData) {
@@ -333,6 +409,9 @@ const GamePage: React.FC = () => {
                      {/* Display start game error */}
                      {startError && <Alert severity="error" sx={{ mb: 2 }}>{startError}</Alert>}
 
+                     {/* Display delete error */}
+                     {deleteError && <Alert severity="error" sx={{ mb: 2 }}>{deleteError}</Alert>}
+
                     {/* ... Game Title, Rules display ... */}
                      <Divider sx={{ my: 2 }} />
                      {/* ... Start Game Button (Conditional) ... */}
@@ -351,6 +430,27 @@ const GamePage: React.FC = () => {
                     )}
                      <Typography variant="h6" component="h2" gutterBottom>Active Players</Typography>
                      {/* ... Player List rendering ... */}
+                     {/* *** This is the section that renders the list *** */}
+                     {activePlayers.length > 0 ? (
+                         <List dense={false}>
+                             {activePlayers.map((player) => (
+                                <ListItem key={player.game_player_id} divider>
+                                    <ListItemAvatar>
+                                        {/* Display color avatar */}
+                                        <Avatar sx={{ bgcolor: player.player_color_in_game, width: 32, height: 32, border: '1px solid grey' }}> </Avatar>
+                                    </ListItemAvatar>
+                                    {/* Display name and balance */}
+                                    <ListItemText
+                                        primary={player.player_name_in_game}
+                                        secondary={`Balance: $${parseFloat(player.current_balance as any).toFixed(2)}`} // ParseFloat fix
+                                    />
+                                </ListItem>
+                            ))}
+                        </List>
+                     ) : (
+                         // This message shows if activePlayers array is empty
+                         <Typography sx={{ mt: 2 }} color="text.secondary">No active players found.</Typography>
+                     )}
                      <Divider sx={{ my: 2 }} />
                      {/* --- Add Round Button (Conditional) --- */}
                      <Box sx={{ mt: 3, display: 'flex', justifyContent: 'center' }}>
@@ -417,6 +517,8 @@ const GamePage: React.FC = () => {
                             activePlayers={activePlayers} // Pass full player data for headers/colors
                             loading={loadingRounds} // Use separate loading state for rounds
                             error={roundsError} // Pass separate rounds error
+                            onDeleteRequest={handleDeleteRoundRequest} // <-- Pass delete handler
+                            isDeleting={isDeletingRound} // Pass loading state for delete
                         />
                     </Box>
                     {/* === End GameHistoryTable === */}
@@ -435,6 +537,17 @@ const GamePage: React.FC = () => {
                     scoreLimits={scoreLimits}
                 />
             )}
+            
+            {/* --- Render the Delete Confirmation Dialog --- */}
+            <ConfirmationDialog
+                open={isDeleteDialogOpen}
+                onClose={handleCloseDeleteDialog}
+                onConfirm={handleConfirmDelete}
+                title="Confirm Delete Round"
+                message={`Are you sure you want to delete Round #${roundToDelete?.round_number}? This action cannot be undone.`}
+                confirmText="Delete"
+                isConfirming={isDeletingRound} // Pass loading state for delete confirmation
+            />
         </>
     );
 };

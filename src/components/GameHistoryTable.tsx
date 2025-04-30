@@ -1,19 +1,22 @@
 // src/components/GameHistoryTable.tsx
 import React from 'react';
 import {
-    Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Paper, Typography, Box, CircularProgress, Alert, Tooltip
+    Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Paper, Typography, Box, CircularProgress, Alert, Tooltip,
+    IconButton
 } from '@mui/material';
 // Import interfaces from GamePage or a shared types file
 import { GamePlayerData, RoundData, RoundStateData } from '../pages/GamePage';
 // Optionally import icons if adding delete buttons later
 // import IconButton from '@mui/material/IconButton';
-// import DeleteIcon from '@mui/icons-material/Delete';
+import DeleteIcon from '@mui/icons-material/Delete';
 
 interface GameHistoryTableProps {
     rounds: RoundData[];
     activePlayers: GamePlayerData[]; // Need full player data for headers/colors
     loading: boolean;
     error: string | null;
+    onDeleteRequest: (round: RoundData) => void; // Callback to request deletion (pass whole round)
+    isDeleting: boolean; // To disable buttons while delete is in progress
     // Add onDeleteRound prop later: onDeleteRound?: (roundId: string) => void;
 }
 
@@ -59,7 +62,9 @@ const GameHistoryTable: React.FC<GameHistoryTableProps> = ({
     rounds = [],
     activePlayers = [],
     loading,
-    error
+    error,
+    onDeleteRequest,
+    isDeleting
     // onDeleteRound, // Add later
 }) => {
 
@@ -111,7 +116,7 @@ const GameHistoryTable: React.FC<GameHistoryTableProps> = ({
                             </Tooltip>
                         ))}
                         {/* Add Action column later for delete */}
-                        {/* <TableCell align="center" sx={{ fontWeight: 'bold', width: '5%' }}>Act</TableCell> */}
+                        {<TableCell align="center" sx={{ fontWeight: 'bold', width: '5%' }}>Act</TableCell>}
                     </TableRow>
                 </TableHead>
                 <TableBody>
@@ -140,7 +145,22 @@ const GameHistoryTable: React.FC<GameHistoryTableProps> = ({
                                     );
                                 })}
                                 {/* Add Delete button cell later */}
-                                {/* <TableCell align="center"> <IconButton size="small" color="error" onClick={() => onDeleteRound?.(round.round_id)}><DeleteIcon fontSize="small" /></IconButton> </TableCell> */}
+                                <TableCell align="center" sx={{ px: 0, py: 0 }}>
+                                    <Tooltip title="Delete Round">
+                                        {/* Disable button while any delete is in progress */}
+                                        <span> {/* Tooltip needs a span wrapper when button is disabled */}
+                                             <IconButton
+                                                size="small"
+                                                color="error"
+                                                // Call handler with the whole round object
+                                                onClick={() => onDeleteRequest(round)}
+                                                disabled={isDeleting} // Disable while deleting
+                                            >
+                                                <DeleteIcon fontSize="inherit" /> {/* Use inherit for better sizing */}
+                                            </IconButton>
+                                        </span>
+                                    </Tooltip>
+                                </TableCell>
                             </TableRow>
                         );
                     })}
