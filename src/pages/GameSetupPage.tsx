@@ -1,7 +1,7 @@
-import React, { useState, useEffect, ChangeEvent, FormEvent } from 'react';
+import { useState, useEffect, ChangeEvent, FormEvent } from 'react';
 import { v4 as uuidv4 } from 'uuid';
 
-import React, { /*...,*/ useNavigate } from 'react-router-dom'; // <-- Import useNavigate
+import { useNavigate } from 'react-router-dom'; // <-- Import useNavigate
 
 // MUI Imports
 import Box from '@mui/material/Box';
@@ -16,6 +16,7 @@ import Grid from '@mui/material/Grid';
 import Paper from '@mui/material/Paper';
 import Container from '@mui/material/Container';
 import Alert from '@mui/material/Alert';
+import { API_URL } from '../config';
 
 // Assuming ScorePreviewItem is defined here or imported
 interface ScorePreviewItem {
@@ -48,15 +49,21 @@ const defaultUpperLimit = 10;
 const defaultLowerLimit = 3;
 const defaultHalfMoneyRule = true;
 const availableColors = [
-    { name: 'Red', value: '#FF0000' }, { name: 'Blue', value: '#0000FF' },
-    { name: 'Yellow', value: '#FFFF00' }, { name: 'Magenta', value: '#FF00FF' },
-    { name: 'Cyan', value: '#00FFFF' }, { name: 'Green', value: '#008000' },
-    { name: 'DarkGray', value: '#A9A9A9' },
+  { name: 'Red', value: '#FF0000' },
+  { name: 'Blue', value: '#0000FF' },
+  { name: 'Yellow', value: '#FFFF00' },
+  { name: 'Magenta', value: '#FF00FF' },
+  { name: 'Cyan', value: '#00FFFF' },
+  { name: 'Green', value: '#008000' },
+  { name: 'DarkGray', value: '#A9A9A9' },
+  { name: 'Purple', value: '#800080' },
+  { name: 'Orange', value: '#FFA500' },
+  { name: 'Pink', value: '#FFC1CC' },
 ];
 const defaultPlayerNames = ['Player 1', 'Player 2', 'Player 3', 'Player 4'];
-const maxMoneyOptions = [16, 24, 32, 48, 64, 96, 128];
-const scoreLimitOptions = Array.from({ length: 18 }, (_, i) => i + 3); // 3 to 20
-const minScoreOptions = Array.from({ length: 5 }, (_, i) => i + 1); // 1 to 5
+const maxMoneyOptions = [8, 16, 24, 32, 48, 64, 96, 128, 256, 512, 1024];  // 8 to 1024
+const scoreLimitOptions = Array.from({ length: 28 }, (_, i) => i + 3);  // 3 to 30
+const minScoreOptions = Array.from({ length: 8 }, (_, i) => i + 1);  // 1 to 8
 
 // --- Component ---
 const GameSetupPage: React.FC = () => {
@@ -100,7 +107,7 @@ const GameSetupPage: React.FC = () => {
             }).toString();
 
             try {
-                const response = await fetch(`http://localhost:3000/games/score-preview?${queryParams}`); // Use your backend URL
+                const response = await fetch(`${API_URL}/games/score-preview?${queryParams}`);
                 if (!response.ok) {
                     let errorMsg = `HTTP error! status: ${response.status}`;
                     try {
@@ -148,11 +155,9 @@ const GameSetupPage: React.FC = () => {
             processedValue = value === 'true';
         }
         // Handle game_name separately as it comes from TextField event
-         if (event.target instanceof HTMLInputElement || event.target instanceof HTMLTextAreaElement) {
-              if(name === 'game_name') processedValue = value;
-         }
-
-
+        if (event.target instanceof HTMLInputElement || event.target instanceof HTMLTextAreaElement) {
+            if(name === 'game_name') processedValue = value;
+        }
         setGameSettings(prev => ({ ...prev, [name]: processedValue }));
         if (error?.includes('score')) setError(null); // Clear score limit errors
     };
@@ -160,9 +165,18 @@ const GameSetupPage: React.FC = () => {
     // --- Validation ---
     const validateInputs = (): boolean => {
         const names = players.map(p => p.name.trim());
-        if (names.some(name => name === '')) { setError('Player names cannot be empty.'); return false; }
-        if (new Set(names).size !== names.length) { setError('Player names must be unique.'); return false; }
-        if (gameSettings.lower_limit_of_score > gameSettings.upper_limit_of_score) { setError('Minimum score cannot be greater than maximum score.'); return false; }
+        if (names.some(name => name === '')) { 
+          setError('Player names cannot be empty.'); 
+          return false; 
+        }
+        if (new Set(names).size !== names.length) { 
+          setError('Player names must be unique.'); 
+          return false; 
+        }
+        if (gameSettings.lower_limit_of_score > gameSettings.upper_limit_of_score) { 
+          setError('Minimum score cannot be greater than maximum score.'); 
+          return false; 
+        }
         setError(null);
         return true;
     };
@@ -191,7 +205,7 @@ const GameSetupPage: React.FC = () => {
         };
 
         try {
-            const response = await fetch('http://localhost:3000/games', { // Replace with your backend URL
+            const response = await fetch('${API_URL}/games', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify(payload),
@@ -233,12 +247,12 @@ const GameSetupPage: React.FC = () => {
                 <Box component="form" onSubmit={handleSubmit} noValidate sx={{ mt: 1 }}>
 
                     {/* --- Player Setup --- */}
-                    <Typography variant="h6" component="h2" gutterBottom sx={{mt: 2}}>
+                    <Typography variant="h6" component="h2" gutterBottom sx={{ mt: 2}}>
                         Players
                     </Typography>
                     <Grid container spacing={2}>
                         {players.map((player, index) => (
-                            <Grid xs={12} sm={6} key={player.id}>
+                            <Grid item xs={12} sm={6} key={player.id} {...({} as any)}>
                                 <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
                                     <TextField
                                         label={`Player ${index + 1} Name`}
@@ -249,22 +263,53 @@ const GameSetupPage: React.FC = () => {
                                         variant="outlined"
                                         size="small"
                                     />
-                                    <FormControl size="small" sx={{ minWidth: 120 }}>
-                                        <InputLabel>Color</InputLabel>
-                                        <Select
-                                            value={player.color}
-                                            label="Color"
-                                            onChange={(e) => handlePlayerColorChange(index, e)}
-                                        >
-                                            {availableColors.map(color => (
-                                                <MenuItem key={color.value} value={color.value}>
-                                                    <Box sx={{ display: 'flex', alignItems: 'center' }}>
-                                                         <Box component="span" sx={{ width: 16, height: 16, bgcolor: color.value, mr: 1, border: '1px solid grey' }} />
-                                                         {color.name}
-                                                    </Box>
-                                                </MenuItem>
-                                            ))}
-                                        </Select>
+                                    <FormControl size="small" sx={{ minWidth: 160 }}>
+                                      <InputLabel>Color</InputLabel>
+                                      <Select
+                                          value={player.color}
+                                          label="Color"
+                                          onChange={(e) => handlePlayerColorChange(index, e)}
+                                          renderValue={(value) => (
+                                              <Box sx={{ display: 'flex', alignItems: 'center' }}>
+                                                  <Box
+                                                      component="span"
+                                                      sx={{
+                                                          width: 16,
+                                                          height: 16,
+                                                          bgcolor: value,
+                                                          mr: 1,
+                                                          border: '1px solid grey',
+                                                      }}
+                                                  />
+                                                  {availableColors.find(color => color.value === value)?.name}
+                                              </Box>
+                                          )}
+                                          MenuProps={{
+                                              PaperProps: {
+                                                  style: {
+                                                      maxHeight: 200, // Make the dropdown scrollable
+                                                  },
+                                              },
+                                          }}
+                                      >
+                                          {availableColors.map(color => (
+                                              <MenuItem key={color.value} value={color.value}>
+                                                  <Box sx={{ display: 'flex', alignItems: 'center' }}>
+                                                      <Box
+                                                          component="span"
+                                                          sx={{
+                                                              width: 16,
+                                                              height: 16,
+                                                              bgcolor: color.value,
+                                                              mr: 1,
+                                                              border: '1px solid grey',
+                                                          }}
+                                                      />
+                                                      {color.name}
+                                                  </Box>
+                                              </MenuItem>
+                                          ))}
+                                      </Select>
                                     </FormControl>
                                 </Box>
                             </Grid>
@@ -276,7 +321,7 @@ const GameSetupPage: React.FC = () => {
                         Game Rules
                     </Typography>
                      <Grid container spacing={2}>
-                         <Grid xs={12}>
+                         <Grid item xs={12} {...({} as any)}>
                              <TextField
                                  label="Game Name (Optional)"
                                  name="game_name"
@@ -287,7 +332,7 @@ const GameSetupPage: React.FC = () => {
                                  size="small"
                              />
                          </Grid>
-                         <Grid xs={6} sm={3}>
+                         <Grid item xs={6} sm={3} {...({} as any)}>
                               <FormControl fullWidth size="small">
                                  <InputLabel>Max Money ($)</InputLabel>
                                  <Select
@@ -300,7 +345,7 @@ const GameSetupPage: React.FC = () => {
                                  </Select>
                              </FormControl>
                          </Grid>
-                         <Grid xs={6} sm={3}>
+                         <Grid item xs={6} sm={3} {...({} as any)}>
                               <FormControl fullWidth size="small">
                                  <InputLabel>Max Score (Fan)</InputLabel>
                                  <Select
@@ -313,7 +358,7 @@ const GameSetupPage: React.FC = () => {
                                  </Select>
                              </FormControl>
                          </Grid>
-                          <Grid xs={6} sm={3}>
+                          <Grid item xs={6} sm={3} {...({} as any)}>
                               <FormControl fullWidth size="small">
                                  <InputLabel>Min Score (Fan)</InputLabel>
                                  <Select
@@ -326,7 +371,7 @@ const GameSetupPage: React.FC = () => {
                                  </Select>
                              </FormControl>
                          </Grid>
-                          <Grid xs={6} sm={3}>
+                          <Grid item xs={6} sm={3} {...({} as any)}>
                              <FormControl fullWidth size="small">
                                  <InputLabel>Score Rule</InputLabel>
                                  <Select

@@ -22,6 +22,7 @@ import TableRow from '@mui/material/TableRow';
 import CircularProgress from '@mui/material/CircularProgress';
 import Alert from '@mui/material/Alert';
 import ArrowBackIcon from '@mui/icons-material/ArrowBack';
+import { API_URL } from '../config';
 
 // Interface for the score preview data item from API
 interface ScorePreviewItem {
@@ -88,7 +89,7 @@ const ScoreReferencePage: React.FC = () => {
         }).toString();
 
         try {
-            const response = await fetch(`http://localhost:3000/games/score-preview?${queryParams}`); // Use your backend URL
+            const response = await fetch(`${API_URL}/games/score-preview?${queryParams}`); // Use your backend URL
             if (!response.ok) {
                 let errorMsg = `HTTP error! status: ${response.status}`;
                 try { const errorData = await response.json(); errorMsg = errorData.message || JSON.stringify(errorData); }
@@ -126,7 +127,7 @@ const ScoreReferencePage: React.FC = () => {
 
                 {/* Settings Selection Grid */}
                 <Grid container spacing={2} sx={{ mb: 3 }}>
-                     <Grid item xs={6} sm={3}>
+                     <Grid item xs={6} sm={3} {...({} as any)}>
                           <FormControl fullWidth size="small">
                              <InputLabel id="max-money-label">Max Money</InputLabel>
                              <Select
@@ -140,7 +141,7 @@ const ScoreReferencePage: React.FC = () => {
                              </Select>
                          </FormControl>
                      </Grid>
-                     <Grid item xs={6} sm={3}>
+                     <Grid item xs={6} sm={3} {...({} as any)}>
                           <FormControl fullWidth size="small">
                              <InputLabel id="max-score-label">Max Score</InputLabel>
                              <Select
@@ -154,7 +155,7 @@ const ScoreReferencePage: React.FC = () => {
                              </Select>
                          </FormControl>
                      </Grid>
-                      <Grid item xs={6} sm={3}>
+                      <Grid item xs={6} sm={3} {...({} as any)}>
                           <FormControl fullWidth size="small">
                              <InputLabel id="min-score-label">Min Score</InputLabel>
                              <Select
@@ -168,7 +169,7 @@ const ScoreReferencePage: React.FC = () => {
                              </Select>
                          </FormControl>
                      </Grid>
-                      <Grid item xs={6} sm={3}>
+                      <Grid item xs={6} sm={3} {...({} as any)}>
                          <FormControl fullWidth size="small">
                              <InputLabel id="score-rule-label">Score Rule</InputLabel>
                              <Select

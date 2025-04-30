@@ -16,6 +16,7 @@ import Alert from '@mui/material/Alert';
 import Box from '@mui/material/Box';
 import Grid from '@mui/material/Grid';
 import Typography from '@mui/material/Typography';
+import { API_URL } from '../config';
 
 // Define WinType enum matching your backend
 export enum WinType {
@@ -145,7 +146,7 @@ const RoundEntryModal: React.FC<RoundEntryModalProps> = ({
         console.log("Using game master token: Present");
 
         try {
-            const response = await fetch(`http://localhost:3000/games/${gameId}/rounds`, { 
+            const response = await fetch(`<span class="math-inline">${API_URL}/games/</span>{gameId}/rounds`, { 
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
@@ -184,51 +185,93 @@ const RoundEntryModal: React.FC<RoundEntryModalProps> = ({
                     {/* Use Grid container for overall form layout */}
                     <Grid container spacing={2}>
                         {/* Winner Select */}
-                        <Grid item xs={12}> {/* Use item here for direct children sizing */}
+                        <Grid item xs={12} sm={8} {...({} as any)}>
                             <FormControl fullWidth required margin="dense" disabled={!activePlayers.length || isLoading}>
                                 <InputLabel id="winner-label">Winner</InputLabel>
-                                <Select labelId="winner-label" value={winnerId} label="Winner" onChange={handleWinnerChange} >
-                                    {activePlayers.map(p => (<MenuItem key={p.game_player_id} value={p.game_player_id}>{p.player_name_in_game}</MenuItem>))}
+                                <Select
+                                    labelId="winner-label"
+                                    value={winnerId}
+                                    label="Winner"
+                                    onChange={handleWinnerChange}
+                                    sx={{
+                                        '& .MuiSelect-select': {
+                                            paddingRight: '32px !important',
+                                            minWidth: '150px',
+                                        },
+                                    }}
+                                >
+                                    {activePlayers.map(p => (
+                                        <MenuItem key={p.game_player_id} value={p.game_player_id}>
+                                            {p.player_name_in_game}
+                                        </MenuItem>
+                                    ))}
                                 </Select>
                             </FormControl>
                         </Grid>
 
                         {/* Win Type Radio */}
-                        <Grid item xs={12}> {/* Use item here */}
-                             <FormControl component="fieldset" margin="dense" disabled={isLoading}>
+                        <Grid item xs={12} sm={8} {...({} as any)}>
+                            <FormControl component="fieldset" margin="dense" disabled={isLoading}>
                                 <Typography component="legend" variant="body2" sx={{ mb: 0.5 }}>Win Type</Typography>
-                                <RadioGroup row name="win_type" value={winType} onChange={handleWinTypeChange} >
-                                     <FormControlLabel value={WinType.NORMAL} control={<Radio size="small"/>} label="Normal" sx={{ mr: 0.5 }}/>
-                                     <FormControlLabel value={WinType.SELF_DRAW_ALL_PAY} control={<Radio size="small"/>} label="Self-Draw (All)" sx={{ mr: 0.5 }}/>
-                                     <FormControlLabel value={WinType.SELF_DRAW_ONE_PAY} control={<Radio size="small"/>} label="Self-Draw (One)" />
+                                <RadioGroup row name="win_type" value={winType} onChange={handleWinTypeChange}>
+                                    <FormControlLabel value={WinType.NORMAL} control={<Radio size="small"/>} label="Normal" sx={{ mr: 0.5 }}/>
+                                    <FormControlLabel value={WinType.SELF_DRAW_ALL_PAY} control={<Radio size="small"/>} label="Self-Draw (All)" sx={{ mr: 0.5 }}/>
+                                    <FormControlLabel value={WinType.SELF_DRAW_ONE_PAY} control={<Radio size="small"/>} label="Self-Draw (One)" />
                                 </RadioGroup>
                             </FormControl>
                         </Grid>
 
-                        {/* Loser Select (Conditional) */}
-                         <Grid item xs={12}> {/* Use item here */}
+                        {/* Loser Select */}
+                        <Grid item xs={12} sm={8} {...({} as any)}>
                             <FormControl fullWidth required={isLoserRequired} margin="dense" disabled={!isLoserRequired || isLoading}>
                                 <InputLabel id="loser-label">Loser</InputLabel>
-                                <Select labelId="loser-label" value={loserId ?? ''} label="Loser" onChange={handleLoserChange} >
-                                    <MenuItem value="" disabled><em>{isLoserRequired ? 'Select Loser' : '(Not Applicable)'}</em></MenuItem>
-                                    {loserOptions.map(p => (<MenuItem key={p.game_player_id} value={p.game_player_id}>{p.player_name_in_game}</MenuItem>))}
+                                <Select
+                                    labelId="loser-label"
+                                    value={loserId ?? ''}
+                                    label="Loser"
+                                    onChange={handleLoserChange}
+                                    sx={{
+                                        '& .MuiSelect-select': {
+                                            paddingRight: '32px !important',
+                                            minWidth: '150px',
+                                        },
+                                    }}
+                                >
+                                    <MenuItem value="" disabled>
+                                        <em>{isLoserRequired ? 'Select Loser' : '(Not Applicable)'}</em>
+                                    </MenuItem>
+                                    {loserOptions.map(p => (
+                                        <MenuItem key={p.game_player_id} value={p.game_player_id}>
+                                            {p.player_name_in_game}
+                                        </MenuItem>
+                                    ))}
                                 </Select>
                             </FormControl>
                         </Grid>
 
                         {/* Score Select */}
-                         <Grid item xs={12}> {/* Use item here */}
-                             <FormControl fullWidth required margin="dense" disabled={isLoading}>
-                                 <InputLabel id="score-label">Score (Fan)</InputLabel>
-                                 <Select labelId="score-label" value={scoreValue} label="Score (Fan)" onChange={handleScoreChange} >
+                        <Grid item xs={12} sm={8} {...({} as any)}>
+                            <FormControl fullWidth required margin="dense" disabled={isLoading}>
+                                <InputLabel id="score-label">Score (Fan)</InputLabel>
+                                <Select
+                                    labelId="score-label"
+                                    value={scoreValue}
+                                    label="Score (Fan)"
+                                    onChange={handleScoreChange}
+                                    sx={{
+                                        '& .MuiSelect-select': {
+                                            paddingRight: '32px !important',
+                                            minWidth: '150px',
+                                        },
+                                    }}
+                                >
                                     {scoreOptions.length > 0 ? scoreOptions.map(score => (
                                         <MenuItem key={score} value={score}>{score}</MenuItem>
-                                     )) : <MenuItem value="" disabled>No valid scores</MenuItem>}
+                                    )) : <MenuItem value="" disabled>No valid scores</MenuItem>}
                                 </Select>
                             </FormControl>
                         </Grid>
-
-                         {error && <Grid item xs={12}><Alert severity="error" variant="outlined" sx={{mt: 1}}>{error}</Alert></Grid>}
+                         {error && <Grid item xs={12} {...({} as any)}><Alert severity="error" variant="outlined" sx={{mt: 1}}>{error}</Alert></Grid>}
                     </Grid>
                 </Box>
             </DialogContent>

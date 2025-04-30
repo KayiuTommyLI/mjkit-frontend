@@ -29,10 +29,11 @@ import ConfirmationDialog from '../components/ConfirmationDialog'; // Import con
 import RoundEntryModal from '../components/RoundEntryModal';
 import GameHistoryTable from '../components/GameHistoryTable'; // <-- Import table component
 import { Collapse, Table, TableBody, TableCell, TableContainer, TableHead, TableRow } from '@mui/material';
+import { API_URL } from '../config';
 
 // --- Interfaces ---
 // (Keep existing GamePlayerData and GameData interfaces)
-interface GamePlayerData {
+export interface GamePlayerData {
     game_player_id: string;
     user_id: string | null;
     player_name_in_game: string;
@@ -161,8 +162,8 @@ const GamePage: React.FC = () => {
         try {
             // Fetch game details and rounds concurrently
             const [gameRes, roundsRes] = await Promise.all([
-                fetch(`http://localhost:3000/games/${gameId}`),
-                fetch(`http://localhost:3000/games/${gameId}/rounds`)
+                fetch(`${API_URL}/games/${gameId}`),
+                fetch(`${API_URL}/games/${gameId}/rounds`)
             ]);
 
             // Process Game Response
@@ -208,7 +209,7 @@ const GamePage: React.FC = () => {
                     halfMoneyRule: String(fetchedGameData.half_money_rule),
                 }).toString();
                 try {
-                    const scoreRes = await fetch(`http://localhost:3000/games/score-preview?${queryParams}`);
+                    const scoreRes = await fetch(`${API_URL}/games/score-preview?${queryParams}`);
                     if (!scoreRes.ok) {
                          let errorMsg = `Score Table Error: ${scoreRes.status}`;
                          try { const d = await scoreRes.json(); errorMsg = d.message || JSON.stringify(d); } catch (e) { errorMsg = `${scoreRes.status} ${scoreRes.statusText}`; }
@@ -261,7 +262,7 @@ const GamePage: React.FC = () => {
         }
         setIsStartingGame(true); setStartError(null);
         try {
-            const response = await fetch(`http://localhost:3000/games/${gameId}/start`, { method: 'POST' });
+            const response = await fetch(`${API_URL}/games/${gameId}/start`, { method: 'POST' });
             if (!response.ok) {
                 let errorMsg = `Failed to start game: ${response.status}`;
                  try { const errorData = await response.json(); errorMsg = errorData.message || JSON.stringify(errorData); }
@@ -338,7 +339,7 @@ const GamePage: React.FC = () => {
         console.log(`Attempting to delete round ID: ${roundToDelete.round_id}`);
 
         try {
-            const response = await fetch(`http://localhost:3000/games/${gameId}/rounds/${roundToDelete.round_id}`, {
+            const response = await fetch(`${API_URL}/games/${gameId}/rounds/${roundToDelete.round_id}`, {
                 method: 'DELETE',
                 headers: {
                     'x-game-master-token': gameMasterToken,
