@@ -1,0 +1,38 @@
+name: Deploy Frontend to GitHub Pages
+
+on:
+  push:
+    branches:
+      - main # Or your default branch
+
+jobs:
+  build-and-deploy:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write # Allow writing to the repo (for gh-pages branch)
+
+    steps:
+      - name: Checkout 🛎️
+        uses: actions/checkout@v4
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20' # Match your development environment
+          cache: 'npm' # Or 'yarn' or 'pnpm'
+
+      - name: Install Dependencies 🔧
+        run: npm ci # Or 'yarn install' or 'pnpm install'
+
+      - name: Build 🔧
+        # Pass the deployed backend URL as an env var
+        run: npm run build
+        env:
+          # Set the base path for GitHub Pages
+          VITE_API_URL=${{ secrets.VITE_API_URL }}
+
+      - name: Deploy 🚀
+        uses: peaceiris/actions-gh-pages@v4
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          publish_dir: ./dist
