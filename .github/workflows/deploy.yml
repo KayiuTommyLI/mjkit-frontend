@@ -1,38 +1,45 @@
 name: Deploy Frontend to GitHub Pages
 
+# Run on pushes to the master branch (as per your repository)
 on:
   push:
     branches:
-      - master 
+      - master # Changed from main to master
+
+# Specify permissions for the GITHUB_TOKEN
+permissions:
+  contents: write # Allow action to write to the gh-pages branch
 
 jobs:
   build-and-deploy:
-    runs-on: ubuntu-latest
-    permissions:
-      contents: write # Allow writing to the repo (for gh-pages branch)
+    runs-on: ubuntu-latest # Use the latest Ubuntu runner
 
     steps:
       - name: Checkout 🛎️
-        uses: actions/checkout@v4
+        uses: actions/checkout@v4 # Checks out your repository code
 
-      - name: Set up Node.js
+      - name: Set up Node.js 🏗️
         uses: actions/setup-node@v4
         with:
-          node-version: '20' # Match your development environment
-          cache: 'npm' # Or 'yarn' or 'pnpm'
+          node-version: '20' # Use Node.js v20, or match your project
+          cache: 'npm'     # Cache npm dependencies
 
-      - name: Install Dependencies 🔧
-        run: npm ci # Or 'yarn install' or 'pnpm install'
+      - name: Install Dependencies 👨‍💻
+        run: npm ci        # Use ci for faster, deterministic installs
 
-      - name: Build 🔧
-        # Pass the deployed backend URL as an env var
+      # vvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvv
+      # This is likely the section around Line 32 causing the error.
+      # Ensure the indentation is exactly as shown (2 spaces for 'env:', 4 spaces for 'VITE_API_URL:')
+      - name: Build 📦
+        # Pass the backend URL secret as an environment variable to the build command
         run: npm run build
-        env:
-          # Set the base path for GitHub Pages
-          VITE_API_URL=${{ secrets.VITE_API_URL }}
+        env: # <-- This line should be indented 2 spaces under '- name: Build 📦'
+          VITE_API_URL: ${{ secrets.VITE_API_URL }} # <-- This line should be indented 2 spaces under 'env:' (4 total)
+      # ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
       - name: Deploy 🚀
         uses: peaceiris/actions-gh-pages@v4
         with:
-          github_token: ${{ secrets.GITHUB_TOKEN }}
-          publish_dir: ./dist
+          github_token: ${{ secrets.GITHUB_TOKEN }} # Use the default token
+          publish_dir: ./dist                      # Directory containing build artifacts
+          # publish_branch: gh-pages # Default is gh-pages
