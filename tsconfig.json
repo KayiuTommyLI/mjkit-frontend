@@ -1,6 +1,7 @@
 {
   "compilerOptions": {
-    "module": "CommonJS", // Or ESNext if using Vite defaults
+    "module": "ESNext", // Or ESNext if using Vite defaults
+    "moduleResolution": "bundler",
     "jsx": "react-jsx",  // <-- Add or verify this line
     "declaration": true,
     "removeComments": true,
