@@ -304,7 +304,7 @@ const GameSetupPage: React.FC = () => {
                 <Grid container spacing={4}> {/* Increased spacing */}
 
                     {/* --- Left Column: Score Preview --- */}
-                    <Grid item xs={12} md={5}>
+                    <Grid item xs={12} md={5} component="div">
                         <Typography variant="h6" component="h2" gutterBottom sx={{ mt: 1 }}> {/* Adjusted mt */}
                             {t('scorePreviewTitle')}
                         </Typography>
@@ -325,7 +325,7 @@ const GameSetupPage: React.FC = () => {
                     </Grid>
 
                     {/* --- Right Column: Main Form --- */}
-                    <Grid item xs={12} md={7}>
+                    <Grid item xs={12} md={7} component="div">
                         <Box component="form" onSubmit={handleSubmit} noValidate sx={{ mt: 1 }}>
 
                             {/* --- Player Setup --- */}
@@ -397,7 +397,7 @@ const GameSetupPage: React.FC = () => {
                                 {t('gameRulesLabel')}
                             </Typography>
                             <Grid container spacing={2}>
-                                <Grid item xs={12}>
+                                <Grid item xs={12} component="div">
                                     <TextField
                                         label={t('gameNameLabel')}
                                         name="game_name"
@@ -409,7 +409,7 @@ const GameSetupPage: React.FC = () => {
                                         sx={inputStyles}
                                     />
                                 </Grid>
-                                <Grid item xs={12}>
+                                <Grid item xs={12} component="div">
                                     <FormControl fullWidth size="small" sx={{...inputStyles, minWidth: 120 }}>
                                         <InputLabel>{t('maxMoneyLabel')} ($)</InputLabel>
                                         <Select
@@ -423,7 +423,7 @@ const GameSetupPage: React.FC = () => {
                                         </Select>
                                     </FormControl>
                                 </Grid>
-                                <Grid item xs={12}>
+                                <Grid item xs={12} component="div">
                                     <FormControl fullWidth size="small" sx={{...inputStyles, minWidth: 120 }}>
                                         <InputLabel>{t('maxScoreLabel')}</InputLabel>
                                         <Select
@@ -437,7 +437,7 @@ const GameSetupPage: React.FC = () => {
                                         </Select>
                                     </FormControl>
                                 </Grid>
-                                <Grid item xs={12}>
+                                <Grid item xs={12} component="div">
                                     <FormControl fullWidth size="small" sx={{...inputStyles, minWidth: 120 }}>
                                         <InputLabel>{t('minScoreLabel')}</InputLabel>
                                         <Select
@@ -451,7 +451,7 @@ const GameSetupPage: React.FC = () => {
                                         </Select>
                                     </FormControl>
                                 </Grid>
-                                <Grid item xs={12}>
+                                <Grid item xs={12} component="div">
                                     <FormControl fullWidth size="small" sx={{...inputStyles, minWidth: 120 }}>
                                         <InputLabel>{t('scoreTypeLabel')}</InputLabel>
                                         <Select
