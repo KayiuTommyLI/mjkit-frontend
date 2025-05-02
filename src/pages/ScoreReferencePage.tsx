@@ -122,7 +122,7 @@ const ScoreReferencePage: React.FC = () => {
                     Score Reference Table
                 </Typography>
                 <Typography variant="body2" color="text.secondary" sx={{ mb: 2 }}>
-                    Select the game rules to see the corresponding money value per Fan score.
+                    Select the game rules to see the corresponding money value per Faan score.
                 </Typography>
 
                 {/* Settings Selection Grid */}
@@ -195,7 +195,7 @@ const ScoreReferencePage: React.FC = () => {
                     <Table size="small" aria-label="score reference table">
                         <TableHead sx={{ backgroundColor: 'action.hover' }}>
                             <TableRow>
-                                <TableCell sx={{ fontWeight: 'bold' }}>Fan (Score)</TableCell>
+                                <TableCell sx={{ fontWeight: 'bold' }}>Faan (Score)</TableCell>
                                 <TableCell align="right" sx={{ fontWeight: 'bold' }}>Money ($)</TableCell>
                             </TableRow>
                         </TableHead>
@@ -210,7 +210,7 @@ const ScoreReferencePage: React.FC = () => {
                                 scoreTable.map((item) => (
                                     <TableRow key={item.score} sx={{ '&:last-child td, &:last-child th': { border: 0 } }}>
                                         <TableCell component="th" scope="row">
-                                            {item.score} Fan
+                                            {item.score} Faan
                                         </TableCell>
                                         <TableCell align="right">${item.money.toFixed(1)}</TableCell>
                                     </TableRow>

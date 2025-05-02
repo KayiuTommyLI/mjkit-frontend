@@ -1,0 +1,40 @@
+{
+    "appTitle": "今晚打幾大",
+    "Faan": "番",
+    "gameSetupTitle": "設定新牌局",
+    "gameSetupSubtitle": "請選擇牌局規則同埋玩家",
+
+    "player": "玩家",    
+    "playerLabel": "玩家 {{index}}",
+    "playerNameHint": "玩家名稱",
+    "playerColorLabel": "代表顏色",
+    "playerInitialOffsetLabel": "初始分數",
+
+    "gameStatusLabel": "狀態",
+    "gameRulesLabel": "規則",
+    "gameNameLabel": "牌局名稱(選填)",
+    "maxMoneyLabel": "打幾多錢",
+    "maxScoreLabel": "打幾多番",
+    "minScoreLabel": "幾番起糊",
+    "scoreTypeLabel": "計法",
+    "scorePreviewTitle": "番數金額預覽",
+    "scoreLabel": "{{score}}番",
+    "moneyLabel": "${{money}}",
+    "halfAfter5Rule": "半辣上",
+    "hotHotUpRule": "辣辣上",
+    "createGameButton": "建立牌局",
+    "langEnglish": "English",
+    "langChinese": "繁體中文",
+    "loadingGame": "載入遊戲中...",
+    "errorLoadingGame": "載入遊戲失敗: {{error}}",
+    "creatingGameButton": "建立牌局中...",
+
+    "SuccessGameCreation": "牌局建成！ID: {{game_id}}。稍後會自動轉到牌局頁面...",
+
+    "errorCreateGame": "錯誤：建立牌局失敗。",
+    "errorOffsetSum": "錯誤：所有玩家嘅初始分數總和必須為零。",
+    "errorMinGreaterMax": "錯誤：最小分數不能大過最大分數。",
+    "errorPlayerNameUnique": "錯誤：玩家名稱必須獨一無二。",
+    "errorPlayerNameEmpty": "錯誤：玩家名稱不能為空。",
+    "errorInvalidScoreLimit": "錯誤: 錯誤的分數限制"
+  }

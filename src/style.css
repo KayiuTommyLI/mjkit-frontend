@@ -24,10 +24,15 @@ a:hover {
 
 body {
   margin: 0;
-  display: flex;
-  place-items: center;
+  /* display: flex; */
+  /* place-items: center; */
   min-width: 320px;
-  min-height: 100vh;
+  /* min-height: 100vh; */
+  
+  /* --- Background Styles --- */
+  /* Fallback color (visible while SVG loads or if SVG fails) */
+  background-color: #1f1f1f; 
+
 }
 
 h1 {
@@ -35,11 +40,50 @@ h1 {
   line-height: 1.1;
 }
 
-#app {
-  max-width: 1280px;
-  margin: 0 auto;
-  padding: 2rem;
-  text-align: center;
+/* #app { */
+#root {
+  max-width: 1280px; /* Or your desired content width */
+  /* Center horizontally, remove vertical margin */
+  margin-left: auto;
+  margin-right: auto;
+  margin-top: 0;
+  margin-bottom: 0;
+  /* Make #root fill viewport height */
+  min-height: 100vh;
+  /*margin: 2rem auto;*/ /* Centers container + adds space top/bottom */
+  padding: 2rem;     /* Padding inside the border */
+  position: relative;  /* Good practice, needed for potential absolute children */
+  z-index: 1;        /* Ensure content is layered above body background */
+
+  /* --- Dark Brown Border --- */
+  border: 5px solid #4B3A2A; /* Replace with YOUR dark brown hex & adjust thickness (e.g., 3px, 10px) */
+  box-sizing: border-box;    /* Makes border width part of the element's total width/height */
+
+  /* Optional: Add a subtle background to the content area itself
+     if needed for readability over the main background */
+  background-color: #2A4B3A;
+  /* background-color: rgba(40, 40, 40, 0.5); */ /* Example: semi-transparent dark */
+  /* border-radius: 8px; */ /* Optional: if you want rounded corners */
+  /* 2. Your SVG Background */
+  background-image: url('/image/background.svg');
+
+  /* 3. Prevent tiling */
+  background-repeat: no-repeat;
+
+  /* 4. Position & Scaling for Watermark */
+  /* 'left bottom': Aligns the SVG's bottom-left with the viewport's bottom-left */
+  /* 'cover': Scales the SVG (keeping aspect ratio) until it covers the entire viewport.
+                 This ensures no gaps, but might crop the top/right edges of the SVG
+                 depending on screen size. The watermark in the SVG's bottom-left
+                 should remain visible in the viewport's bottom-left corner. */
+  background-position: left bottom;
+  background-size: cover;
+
+  /* 5. Keep background fixed when scrolling */
+  background-attachment: fixed;
+
+  /* Ensure text color provides contrast (using :root is usually better) */
+  /* color: rgba(255, 255, 255, 0.87); */ /* Example if needed */
 }
 
 .logo {

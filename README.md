@@ -8,7 +8,7 @@ This is the frontend application for MJKit, a tool designed to help track scores
 
 *   **Game Setup:** Configure new Mahjong games ([`src/pages/GameSetupPage.tsx`](src/pages/GameSetupPage.tsx)):
     *   Set player names and assign unique colors.
-    *   Define game rules: Max Money, Max Score (Fan), Min Score (Fan).
+    *   Define game rules: Max Money, Max Score (Faan), Min Score (Faan).
     *   Choose scoring rules (e.g., Half Money After 5).
     *   Optional game naming.
     *   Real-time score preview based on selected rules (fetches from `/games/score-preview`).

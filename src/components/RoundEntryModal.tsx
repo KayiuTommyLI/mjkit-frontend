@@ -252,11 +252,11 @@ const RoundEntryModal: React.FC<RoundEntryModalProps> = ({
                         {/* Score Select */}
                         <Grid item xs={12} sm={8} {...({} as any)}>
                             <FormControl fullWidth required margin="dense" disabled={isLoading}>
-                                <InputLabel id="score-label">Score (Fan)</InputLabel>
+                                <InputLabel id="score-label">Score (Faan)</InputLabel>
                                 <Select
                                     labelId="score-label"
                                     value={scoreValue}
-                                    label="Score (Fan)"
+                                    label="Score (Faan)"
                                     onChange={handleScoreChange}
                                     sx={{
                                         '& .MuiSelect-select': {

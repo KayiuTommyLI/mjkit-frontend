@@ -1,0 +1,41 @@
+{
+    "appTitle": "Mahjong Scorekeeper (Tonight hit how large)",
+    "Faan": "Faan",
+    "gameSetupTitle": "Setup New Game",
+    "gameSetupSubtitle": "Please select game rules and players",
+
+    "player": "Player",
+    "playerLabel": "Player {{index}}",
+    "playerNameHint": "Player Name",
+    "playerColorLabel": "Color",
+    "playerInitialOffsetLabel": "Initial Offset",
+
+    "gameRulesLabel": "Game Rules",
+    "gameNameLabel": "Game Name (Optional)",
+
+    "maxMoneyLabel": "Max Money",
+    "maxScoreLabel": "Max Score (Faan)",
+    "minScoreLabel": "Min Score (Faan)",
+    "scoreTypeLabel": "Scoring Rule",
+    "scorePreviewTitle": "Score Preview",
+    "scoreLabel": "{{score}} Faan",
+    "moneyLabel": "${{money}}",
+    "halfAfter5Rule": "Half Money After 5",
+    "hotHotUpRule": "Hot Hot Up",
+    "createGameButton": "Create Game",
+    "langEnglish": "English",
+    "langChinese": "繁體中文",
+    "loadingGame": "Loading Game...",
+    "errorLoadingGame": "Failed to load game: {{error}}",
+    "gameStatusLabel": "Status",
+    "creatingGameButton": "Creating Game...",
+
+    "SuccessGameCreation": "Game created! ID: {{game_id}}. Redirecting soon...",
+
+    "errorCreateGame": "Error: Failed to create game.",
+    "errorOffsetSum": "Error: The sum of all initial player offsets must be zero.",
+    "errorMinGreaterMax": "Minimum score cannot be greater than maximum score.",
+    "errorPlayerNameUnique": "Error: Player names must be unique.",
+    "errorPlayerNameEmpty": "Error: Player name cannot be empty.",
+    "errorInvalidScoreLimit": "Error: Invalid score limits"
+  }

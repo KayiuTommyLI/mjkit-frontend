@@ -484,7 +484,7 @@ const GamePage: React.FC = () => {
                                     <Table size="small" aria-label="score reference table">
                                         <TableHead sx={{ backgroundColor: 'action.hover' }}>
                                             <TableRow>
-                                                <TableCell sx={{ fontWeight: 'bold' }}>Fan</TableCell>
+                                                <TableCell sx={{ fontWeight: 'bold' }}>Faan</TableCell>
                                                 <TableCell align="right" sx={{ fontWeight: 'bold' }}>Money ($)</TableCell>
                                             </TableRow>
                                         </TableHead>

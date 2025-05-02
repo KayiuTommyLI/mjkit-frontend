@@ -25,8 +25,12 @@
     "@mui/material": "^7.0.2",
     "@mui/system": "^7.0.2",
     "@mui/types": "^7.4.1",
+    "i18next": "^25.0.2",
+    "i18next-browser-languagedetector": "^8.1.0",
+    "mui-color-input": "^7.0.0",
     "react": "^19.1.0",
     "react-dom": "^19.1.0",
+    "react-i18next": "^15.5.1",
     "react-router-dom": "^7.5.2",
     "uuid": "^11.1.0"
   }
