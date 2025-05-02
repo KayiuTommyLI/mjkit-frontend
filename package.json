@@ -9,29 +9,29 @@
     "preview": "vite preview"
   },
   "devDependencies": {
-    "@types/node": "^22.15.3",
-    "@types/react": "^19.1.2",
-    "@types/react-dom": "^19.1.2",
-    "@types/uuid": "^10.0.0",
-    "@vitejs/plugin-react": "^4.4.1",
-    "typescript": "~5.7.2",
-    "vite": "^6.3.1"
+    "@types/node": "^20.11.5",
+    "@types/react": "^18.2.48",
+    "@types/react-dom": "^18.2.18",
+    "@types/uuid": "^9.0.7",
+    "@vitejs/plugin-react": "^4.2.1",
+    "typescript": "^5.3.3",
+    "vite": "^5.0.12"
   },
   "dependencies": {
-    "@emotion/react": "^11.14.0",
-    "@emotion/styled": "^11.14.0",
-    "@fontsource/roboto": "^5.2.5",
-    "@mui/icons-material": "^7.0.2",
-    "@mui/material": "^7.0.2",
-    "@mui/system": "^7.0.2",
-    "@mui/types": "^7.4.1",
-    "i18next": "^25.0.2",
-    "i18next-browser-languagedetector": "^8.1.0",
-    "mui-color-input": "^7.0.0",
-    "react": "^19.1.0",
-    "react-dom": "^19.1.0",
-    "react-i18next": "^15.5.1",
-    "react-router-dom": "^7.5.2",
-    "uuid": "^11.1.0"
+    "@emotion/react": "^11.11.3",
+    "@emotion/styled": "^11.11.0",
+    "@fontsource/roboto": "^5.0.8",
+    "@mui/icons-material": "^5.15.5",
+    "@mui/material": "^5.15.5",
+    "@mui/system": "^5.15.5",
+    "@mui/types": "^7.2.13",
+    "i18next": "^23.7.16",
+    "i18next-browser-languagedetector": "^7.2.0",
+    "mui-color-input": "^2.0.1",
+    "react": "^18.2.0",
+    "react-dom": "^18.2.0",
+    "react-i18next": "^14.0.0",
+    "react-router-dom": "^6.21.2",
+    "uuid": "^9.0.1"
   }
 }
