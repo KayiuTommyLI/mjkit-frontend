@@ -303,26 +303,6 @@ const GameSetupPage: React.FC = () => {
 
                 <Grid container spacing={4}> {/* Increased spacing */}
 
-                    {/* --- Left Column: Score Preview --- */}
-                    <Grid item xs={12} md={5}>
-                        <Typography variant="h6" component="h2" gutterBottom sx={{ mt: 1 }}> {/* Adjusted mt */}
-                            {t('scorePreviewTitle')}
-                        </Typography>
-                        <Paper variant="outlined" sx={{
-                            p: 2,
-                            minHeight: '200px', // Adjust as needed
-                            maxHeight: 'calc(100vh - 300px)', // Example max height, adjust based on surrounding elements
-                            overflowY: 'auto', // Make it scrollable if content exceeds maxHeight
-                            whiteSpace: 'pre-wrap',
-                            backgroundColor: 'transparent',
-                            fontFamily: 'monospace',
-                            lineHeight: 1.6, // Improve readability
-                            fontSize: '1.2rem',
-                            color: 'silver', // Set text color to silver
-                        }}>
-                            {scorePreview.length > 0 ? scorePreview.join('\n') : t('calculatingPreview')} {/* Use translation */}
-                        </Paper>
-                    </Grid>
 
                     {/* --- Right Column: Main Form --- */}
                     <Grid item xs={12} md={7}>
@@ -470,8 +450,8 @@ const GameSetupPage: React.FC = () => {
 
                             {/* --- Error Display --- */}
                             <Box sx={{ mt: 2, minHeight: '40px' }}>
-                                {error && <Alert severity="error" sx={{ mb: 1 , color: 'white' }}>{error}</Alert>}
-                                {offsetError && <Alert severity="error" sx={{ mb: 1 , color: 'white' }}>{offsetError}</Alert>}
+                                {error && <Alert severity="error" sx={{ mb: 1 }}>{error}</Alert>}
+                                {offsetError && <Alert severity="error" sx={{ mb: 1 }}>{offsetError}</Alert>}
                                 {apiSuccessMessage && <Alert severity="success">{apiSuccessMessage}</Alert>}
                             </Box>
 
@@ -486,6 +466,26 @@ const GameSetupPage: React.FC = () => {
                                 {isLoading ? t('creatingGameButton') : t('createGameButton')}
                             </Button>
                         </Box>
+                    </Grid>
+                    {/* --- Left Column: Score Preview --- */}
+                    <Grid item xs={12} md={5}>
+                        <Typography variant="h6" component="h2" gutterBottom sx={{ mt: 1 }}> {/* Adjusted mt */}
+                            {t('scorePreviewTitle')}
+                        </Typography>
+                        <Paper variant="outlined" sx={{
+                            p: 2,
+                            minHeight: '200px', // Adjust as needed
+                            maxHeight: 'calc(100vh - 300px)', // Example max height, adjust based on surrounding elements
+                            overflowY: 'auto', // Make it scrollable if content exceeds maxHeight
+                            whiteSpace: 'pre-wrap',
+                            backgroundColor: 'transparent',
+                            fontFamily: 'monospace',
+                            lineHeight: 1.6, // Improve readability
+                            fontSize: '1.2rem',
+                            color: 'silver', // Set text color to silver
+                        }}>
+                            {scorePreview.length > 0 ? scorePreview.join('\n') : t('calculatingPreview')} {/* Use translation */}
+                        </Paper>
                     </Grid>
                 </Grid>
             </Paper>
