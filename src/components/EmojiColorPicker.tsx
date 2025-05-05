@@ -19,18 +19,18 @@ interface EmojiColorPickerProps {
   onEmojiChange?: (emoji: string) => void;
   label?: string;
   colors?: Array<{name: string, value: string}>;
+  noBorder?: boolean;
 }
 
 // Categorized emojis for organized selection
 const emojiCategories = [
   {
-    name: "Faces & People",
+    name: "Fantasy & Magic",
     emojis: [
-      '😀', '😁', '😂', '🤣', '😃', '😄', '😅', '😆', '😉', '😊', 
-      '😋', '😎', '😍', '🥰', '😘', '😗', '😙', '😚', '🙂', '🤔',
-      '🤨', '😐', '😑', '😶', '🙄', '😏', '😣', '😥', '😮', '🤐',
-      '😯', '😪', '😫', '🥱', '😴', '😌', '😛', '😜', '😝', '🤤',
-      '👶', '👧', '🧒', '👦', '👩', '🧑', '👨', '👴', '👵', '🧓'
+      '🧙', '🧙‍♀️', '🧙‍♂️', '🧚', '🧚‍♀️', '🧚‍♂️', '🧛', '🧛‍♀️', '🧛‍♂️', '🧜',
+      '🧜‍♀️', '🧜‍♂️', '🧝', '🧝‍♀️', '🧝‍♂️', '🧞', '🧞‍♀️', '🧞‍♂️', '🧟', '🧟‍♀️',
+      '🧟‍♂️', '👻', '👽', '👾', '🤖', '💀', '☠️', '👹', '👺', '🤡',
+      '💩', '👿', '😈', '🤠', '🤡', '👻', '💀', '☠️', '👽', '🛸'
     ]
   },
   {
@@ -44,21 +44,22 @@ const emojiCategories = [
     ]
   },
   {
+    name: "Faces & People",
+    emojis: [
+      '😀', '😁', '😂', '🤣', '😃', '😄', '😅', '😆', '😉', '😊', 
+      '😋', '😎', '😍', '🥰', '😘', '😗', '😙', '😚', '🙂', '🤔',
+      '🤨', '😐', '😑', '😶', '🙄', '😏', '😣', '😥', '😮', '🤐',
+      '😯', '😪', '😫', '🥱', '😴', '😌', '😛', '😜', '😝', '🤤',
+      '👶', '👧', '🧒', '👦', '👩', '🧑', '👨', '👴', '👵', '🧓'
+    ]
+  },
+  {
     name: "Game & Fun",
     emojis: [
       '🎮', '🎲', '🎯', '🎪', '🎭', '🎨', '🎰', '🎱', '🎳', '♟️',
       '🎴', '🀄', '🎪', '🎫', '🎟️', '🧩', '🧸', '🖼️', '🎨', '🎭',
       '🎪', '🎬', '🎤', '🎧', '🎼', '🎹', '🥁', '🎷', '🎺', '🎸',
       '🪘', '🎻', '🎲', '🎯', '🎳', '🎮', '🎰', '🧩', '🎪', '🎭'
-    ]
-  },
-  {
-    name: "Fantasy & Magic",
-    emojis: [
-      '🧙', '🧙‍♀️', '🧙‍♂️', '🧚', '🧚‍♀️', '🧚‍♂️', '🧛', '🧛‍♀️', '🧛‍♂️', '🧜',
-      '🧜‍♀️', '🧜‍♂️', '🧝', '🧝‍♀️', '🧝‍♂️', '🧞', '🧞‍♀️', '🧞‍♂️', '🧟', '🧟‍♀️',
-      '🧟‍♂️', '👻', '👽', '👾', '🤖', '💀', '☠️', '👹', '👺', '🤡',
-      '💩', '👿', '😈', '🤠', '🤡', '👻', '💀', '☠️', '👽', '🛸'
     ]
   },
   {
@@ -139,7 +140,8 @@ export const EmojiColorPicker: React.FC<EmojiColorPickerProps> = ({
   emoji = '🖌️',
   onEmojiChange,
   label,
-  colors = []
+  colors = [],
+  noBorder
 }) => {
   const [anchorEl, setAnchorEl] = useState<HTMLDivElement | null>(null);
   const [tabValue, setTabValue] = useState(0); // 0 for colors, 1 for emojis
@@ -238,13 +240,13 @@ export const EmojiColorPicker: React.FC<EmojiColorPickerProps> = ({
           display: 'flex',
           alignItems: 'center',
           justifyContent: 'center',
-          p: 1,
-          border: '1px solid silver',
+          p: 0.7,
+          border: noBorder ? 'none' : '1px solid silver', // Apply border conditionally
           borderRadius: 1,
-          width: '100%',
-          height: '36px',
+          width: '80%',
+          height: '28px',
           '&:hover': {
-            borderColor: 'white'
+            borderColor: noBorder ? 'transparent' : 'white'
           }
         }}
       >
@@ -255,7 +257,7 @@ export const EmojiColorPicker: React.FC<EmojiColorPickerProps> = ({
             height: 28, 
             borderRadius: '50%', 
             backgroundColor: value,
-            border: '1px solid rgba(255,255,255,0.3)',
+            border: '1px solid rgba(255,255,255,0.2)',
             display: 'flex',
             alignItems: 'center',
             justifyContent: 'center'

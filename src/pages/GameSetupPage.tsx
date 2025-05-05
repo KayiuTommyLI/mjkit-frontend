@@ -426,17 +426,21 @@ const GameSetupPage: React.FC = () => {
                                     key={player.id}
                                     sx={{
                                         display: 'flex',
+                                        flexWrap: 'wrap',
                                         alignItems: 'center',
-                                        gap: 3, // Increased from 1.5 to 3 for more separation
-                                        mb: 2
+                                        gap: { xs: 1.5, sm: 2 },
+                                        mb: 2,
+                                        width: '100%'
                                     }}
                                 >
                                     {/* 1. EmojiColorPicker - Make sure it has its own space */}
                                     <Box sx={{ 
-                                        width: '40px', // Reduce from 85px to 72px
+                                        width: '40px',
+                                        height: '40px',
                                         flexShrink: 0,
                                         display: 'flex',
-                                        alignItems: 'center'
+                                        alignItems: 'center',
+                                        justifyContent: 'center'
                                     }}>
                                         <EmojiColorPicker
                                             // label={t('playerColorLabel')}
@@ -445,26 +449,39 @@ const GameSetupPage: React.FC = () => {
                                             emoji={player.emoji}
                                             onEmojiChange={(newEmoji) => handlePlayerEmojiChange(index, newEmoji)}
                                             colors={availableColors}
+                                            noBorder={false}
                                         />
                                     </Box>
                                     
                                     {/* 2. Player Name TextField */}
-                                    <TextField
-                                        label={t('playerLabel', { index: index + 1 })}
-                                        value={player.name}
-                                        onChange={(e) => handlePlayerNameChange(index, e.target.value)}
-                                        required 
-                                        variant="outlined" 
-                                        size="small" 
-                                        sx={{
-                                            ...inputStyles, 
-                                            flexGrow: 1,
-                                            mx: 1 // Add horizontal margin
-                                        }}
-                                    />
+                                    <Box sx={{ 
+                                        flexGrow: 1, 
+                                        flexShrink: 1,
+                                        minWidth: { xs: '100%', sm: '180px' }
+                                    }}>
+                                        <TextField
+                                            label={t('playerLabel', { index: index + 1 })}
+                                            value={player.name}
+                                            onChange={(e) => handlePlayerNameChange(index, e.target.value)}
+                                            required 
+                                            variant="outlined" 
+                                            size="small" 
+                                            fullWidth
+                                            sx={{
+                                                ...inputStyles,
+                                                ml: { xs: '40px', sm: 0 },
+                                                mt: { xs: 1, sm: 0 }
+                                            }}
+                                        />
+                                    </Box>
                                     
                                     {/* 3. Initial Offset TextField */}
-                                    <Box sx={{ width: '100px', flexShrink: 0 }}> {/* Fixed width container */}
+                                    <Box sx={{ 
+                                        flexShrink: 0,
+                                        width: { xs: 'calc(100% - 40px)', sm: '110px' },
+                                        ml: { xs: '40px', sm: 0 },
+                                        mt: { xs: 1, sm: 0 }
+                                    }}>
                                         <TextField
                                             label={t('playerInitialOffsetLabel')} 
                                             type="number" 
@@ -472,11 +489,20 @@ const GameSetupPage: React.FC = () => {
                                             onChange={(e) => handlePlayerOffsetChange(index, e.target.value)}
                                             variant="outlined" 
                                             size="small"
+                                            fullWidth
                                             InputProps={{ 
-                                                startAdornment: <InputAdornment position="start">$</InputAdornment> 
+                                                startAdornment: <InputAdornment position="start">
+                                                    <Typography color="white">$</Typography>
+                                                </InputAdornment> 
                                             }}
-                                            inputProps={{ step: "0.1" }} 
-                                            sx={{ ...inputStyles, width: '100%' }}
+                                            // Fix step control with more precise configuration
+                                            inputProps={{ 
+                                                step: 0.1,  // Use number instead of string
+                                                min: -999999,  // Add reasonable min/max
+                                                max: 999999,
+                                                style: { color: 'white' }  // Ensure text color consistency
+                                            }} 
+                                            sx={inputStyles}
                                         />
                                     </Box>
                                 </Box>
