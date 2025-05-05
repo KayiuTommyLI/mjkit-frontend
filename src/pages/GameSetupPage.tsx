@@ -9,6 +9,8 @@ import Button from '@mui/material/Button';
 import TextField from '@mui/material/TextField';
 import Select, { SelectChangeEvent } from '@mui/material/Select';
 import MenuItem from '@mui/material/MenuItem';
+import Slider from '@mui/material/Slider';
+import Radio from '@mui/material/Radio';
 import FormControl from '@mui/material/FormControl';
 import InputLabel from '@mui/material/InputLabel';
 import Typography from '@mui/material/Typography';
@@ -17,14 +19,27 @@ import Paper from '@mui/material/Paper';
 import Container from '@mui/material/Container';
 import Alert from '@mui/material/Alert';
 import { API_URL } from '../config';
+import { inputStyles, whiteContainedButtonSx } from '../styles/formStyles';
+// import { InputAdornment } from '@mui/material';
+// import { MuiColorInput } from 'mui-color-input';
+import React from 'react';
+import { EmojiColorPicker } from '../components/EmojiColorPicker';
 import { InputAdornment } from '@mui/material';
-import { MuiColorInput } from 'mui-color-input';
+
 
 // Assuming ScorePreviewItem is defined here or imported
 interface ScorePreviewItem {
     score: number;
     money: number;
 }
+
+interface PlayerSetup {
+    id: string;
+    name: string;
+    color: string;
+    emoji: string;  // Add this to store the player's chosen emoji
+    // ...any other fields
+  }
 
 // --- Interfaces (Match CreateGameDto structure) ---
 interface InitialPlayerDto {
@@ -52,15 +67,15 @@ const defaultUpperLimit = 10;
 const defaultLowerLimit = 3;
 const defaultHalfMoneyRule = true;
 const availableColors = [
-  { name: 'Red', value: '#FF0000' },
   { name: 'Blue', value: '#0000FF' },
-  { name: 'Yellow', value: '#FFFF00' },
+  { name: 'Red', value: '#FF0000' },
   { name: 'Magenta', value: '#FF00FF' },
-  { name: 'Cyan', value: '#00FFFF' },
   { name: 'Green', value: '#008000' },
   { name: 'DarkGray', value: '#A9A9A9' },
-  { name: 'Purple', value: '#800080' },
+  { name: 'Cyan', value: '#00FFFF' },
   { name: 'Orange', value: '#FFA500' },
+  { name: 'Yellow', value: '#FFFF00' },
+  { name: 'Purple', value: '#800080' },
   { name: 'Pink', value: '#FFC1CC' },
 ];
 const defaultPlayerNames = ['Player 1', 'Player 2', 'Player 3', 'Player 4'];
@@ -68,21 +83,24 @@ const initialOffset = 0; // Default initial offset for players
 const maxMoneyOptions = [8, 16, 24, 32, 48, 64, 96, 128, 256, 512, 1024];  // 8 to 1024
 const scoreLimitOptions = Array.from({ length: 28 }, (_, i) => i + 3);  // 3 to 30
 const minScoreOptions = Array.from({ length: 8 }, (_, i) => i + 1);  // 1 to 8
+const defaultEmoji = ['👺', '👻', '👼', '🐼', '🌝', '🤠', '🤡', '🦁', '🐮', '🐷'];
+const MIN_PLAYERS = 4;
+const MAX_PLAYERS = 10;
 
-// Style object for TextFields/Selects (to avoid repetition)
-const inputStyles = {
-    '& label.Mui-focused': { color: 'white' },
-    '& .MuiInputLabel-root': { color: 'silver' }, // Label color
-    '& .MuiOutlinedInput-root': {
-        '& fieldset': { borderColor: 'silver' }, // Border color
-        '&:hover fieldset': { borderColor: 'white' },
-        '&.Mui-focused fieldset': { borderColor: 'white' },
-        '& input': { color: 'white' }, // Input text color (for TextField)
-        '& .MuiSelect-select': { color: 'white' }, // Select value color
-        '& .MuiSvgIcon-root': { color: 'silver'} // Select dropdown arrow color
-    },
-     '& .MuiInputAdornment-root p': { color: 'silver' } // Adornment color (for offset)
-};
+// // Style object for TextFields/Selects (to avoid repetition)
+// const inputStyles = {
+//     '& label.Mui-focused': { color: 'white' },
+//     '& .MuiInputLabel-root': { color: 'silver' }, // Label color
+//     '& .MuiOutlinedInput-root': {
+//         '& fieldset': { borderColor: 'silver' }, // Border color
+//         '&:hover fieldset': { borderColor: 'white' },
+//         '&.Mui-focused fieldset': { borderColor: 'white' },
+//         '& input': { color: 'white' }, // Input text color (for TextField)
+//         '& .MuiSelect-select': { color: 'white' }, // Select value color
+//         '& .MuiSvgIcon-root': { color: 'silver'} // Select dropdown arrow color
+//     },
+//      '& .MuiInputAdornment-root p': { color: 'silver' } // Adornment color (for offset)
+// };
 
 // --- Component ---
 const GameSetupPage: React.FC = () => {
@@ -95,7 +113,8 @@ const GameSetupPage: React.FC = () => {
             id: index,
             name: name,
             color: availableColors[index % availableColors.length].value,
-            initial_offset: initialOffset
+            initial_offset: initialOffset,
+            emoji: defaultEmoji[index % defaultEmoji.length]
         }))
     );
 
@@ -104,6 +123,7 @@ const GameSetupPage: React.FC = () => {
         upper_limit_of_score: defaultUpperLimit,
         lower_limit_of_score: defaultLowerLimit,
         half_money_rule: defaultHalfMoneyRule,
+        one_pay_all_rule: false,
         game_name: '',
     });
 
@@ -125,6 +145,7 @@ const GameSetupPage: React.FC = () => {
                 upperLimitOfScore: String(gameSettings.upper_limit_of_score),
                 lowerLimitOfScore: String(gameSettings.lower_limit_of_score),
                 halfMoneyRule: String(gameSettings.half_money_rule),
+                onePayAllRule: String(gameSettings.one_pay_all_rule), // Add this line
             }).toString();
 
             try {
@@ -150,7 +171,8 @@ const GameSetupPage: React.FC = () => {
             }
         };
         fetchScorePreview();
-    }, [gameSettings.max_money, gameSettings.upper_limit_of_score, gameSettings.lower_limit_of_score, gameSettings.half_money_rule, i18n.language, t]);
+    }, [gameSettings.max_money, gameSettings.upper_limit_of_score, gameSettings.lower_limit_of_score, 
+        gameSettings.half_money_rule, gameSettings.one_pay_all_rule, i18n.language, t]);
 
     // --- Handlers ---
     const handlePlayerNameChange = (index: number, value: string) => {
@@ -180,7 +202,7 @@ const GameSetupPage: React.FC = () => {
 
         if (name === 'max_money' || name === 'upper_limit_of_score' || name === 'lower_limit_of_score') {
             processedValue = Number(value);
-        } else if (name === 'half_money_rule') {
+        } else if (name === 'half_money_rule' || name === 'one_pay_all_rule') {
             processedValue = value === 'true';
         }
         // Handle game_name separately as it comes from TextField event
@@ -189,6 +211,34 @@ const GameSetupPage: React.FC = () => {
         }
         setGameSettings(prev => ({ ...prev, [name]: processedValue }));
         if (error?.includes(t('Faan'))) setError(null); // Clear score limit errors
+    };
+
+    // Add emoji handler
+    const handlePlayerEmojiChange = (index: number, emoji: string) => {
+        const updatedPlayers = [...players];
+        updatedPlayers[index].emoji = emoji;
+        setPlayers(updatedPlayers);
+    };
+
+    const addPlayer = () => {
+        if (players.length >= MAX_PLAYERS) return;
+        
+        // Create a new player with default values
+        const newPlayer = {
+            id: players.length,
+            name: `Player ${players.length + 1}`,
+            color: availableColors[players.length % availableColors.length].value,
+            initial_offset: initialOffset,
+            emoji: defaultEmoji[players.length % defaultEmoji.length]
+        };
+        
+        setPlayers(prevPlayers => [...prevPlayers, newPlayer]);
+    };
+    
+    const removePlayer = () => {
+        if (players.length <= MIN_PLAYERS) return;
+        
+        setPlayers(prevPlayers => prevPlayers.slice(0, -1));
     };
 
     // --- Validation ---
@@ -267,15 +317,18 @@ const GameSetupPage: React.FC = () => {
             }
             const createdGame = await response.json();
             console.log('Game created successfully:', createdGame);
-             const gameId = createdGame?.game_id ?? 'UNKNOWN_ID';
-            setApiSuccessMessage(t('SuccessGameCreation', { gameId }));
+            const gameId = createdGame.game.game_id ?? 'UNKNOWN_ID';
+            setApiSuccessMessage(t('SuccessGameCreation', { game_id: gameId }));
+
+            localStorage.setItem(`gameMasterToken_${gameId}`, createdGame.gameMasterToken);
+            console.log(`Game Master Token stored for game ${gameId}`);
 
             setTimeout(() => {
-                if (createdGame?.game_id) {
-                    navigate(`/game/${createdGame.game_id}`);
+                if (gameId) {
+                    navigate(`/game/${gameId}`);
                 } else {
                    console.error("Game ID not found in response");
-                   setError(t('errorCreateGameIdMissing')); // Add translation for this
+                   setError(t('errorCannotStartNoId')); // Add translation for this
                    setIsLoading(false);
                 }
             }, 1500); // 1.5 second delay
@@ -286,6 +339,7 @@ const GameSetupPage: React.FC = () => {
             setIsLoading(false);
         } 
     };
+
     // --- Render ---
     return (
         <Container maxWidth="lg" sx={{ mt: 4, mb: 4 }}>
@@ -302,8 +356,6 @@ const GameSetupPage: React.FC = () => {
                 </Typography>
 
                 <Grid container spacing={4}> {/* Increased spacing */}
-
-
                     {/* --- Right Column: Main Form --- */}
                     <Grid item xs={12} md={7}>
                         <Box component="form" onSubmit={handleSubmit} noValidate sx={{ mt: 1 }}>
@@ -312,65 +364,143 @@ const GameSetupPage: React.FC = () => {
                             <Typography variant="h6" component="h2" gutterBottom sx={{ color: 'white' }}>
                                 {t('player')}
                             </Typography>
+                            <Box sx={{ 
+                                display: 'flex', 
+                                alignItems: 'center',
+                                justifyContent: 'space-between', 
+                                mb: 2
+                            }}>
+                                <Typography variant="body2" color="silver">
+                                    {t('playerCountLabel', { count: players.length })}
+                                </Typography>
+                                <Box sx={{ display: 'flex', gap: 1 }}>
+                                    <Button 
+                                        variant="outlined" 
+                                        size="small" 
+                                        onClick={removePlayer}
+                                        disabled={players.length <= MIN_PLAYERS}
+                                        sx={{
+                                            minWidth: '36px',
+                                            color: 'silver',
+                                            borderColor: 'silver',
+                                            '&:hover': {
+                                                borderColor: 'white',
+                                                color: 'white',
+                                            },
+                                            '&.Mui-disabled': {
+                                                color: 'rgba(255, 255, 255, 0.3)',
+                                                borderColor: 'rgba(255, 255, 255, 0.3)',
+                                            }
+                                        }}
+                                    >
+                                        -
+                                    </Button>
+                                    <Typography variant="body1" sx={{ minWidth: '20px', textAlign: 'center', color: 'white' }}>
+                                        {players.length}
+                                    </Typography>
+                                    <Button 
+                                        variant="outlined" 
+                                        size="small"
+                                        onClick={addPlayer}
+                                        disabled={players.length >= MAX_PLAYERS}
+                                        sx={{
+                                            minWidth: '36px',
+                                            color: 'silver',
+                                            borderColor: 'silver',
+                                            '&:hover': {
+                                                borderColor: 'white',
+                                                color: 'white',
+                                            },
+                                            '&.Mui-disabled': {
+                                                color: 'rgba(255, 255, 255, 0.3)',
+                                                borderColor: 'rgba(255, 255, 255, 0.3)',
+                                            }
+                                        }}
+                                    >
+                                        +
+                                    </Button>
+                                </Box>
+                            </Box>
                             {players.map((player, index) => (
                                 <Box
-                                    key={player.id} // Key on the root element in the map
+                                    key={player.id}
                                     sx={{
                                         display: 'flex',
                                         alignItems: 'center',
-                                        gap: 1.5,
-                                        mb: 2 // Adjust spacing as needed (margin-bottom: 16px)
+                                        gap: 3, // Increased from 1.5 to 3 for more separation
+                                        mb: 2
                                     }}
                                 >
-                                    {/* Player Name TextField */}
+                                    {/* 1. EmojiColorPicker - Make sure it has its own space */}
+                                    <Box sx={{ 
+                                        width: '40px', // Reduce from 85px to 72px
+                                        flexShrink: 0,
+                                        display: 'flex',
+                                        alignItems: 'center'
+                                    }}>
+                                        <EmojiColorPicker
+                                            // label={t('playerColorLabel')}
+                                            value={player.color}
+                                            onChange={(newColor) => handlePlayerColorChange(index, newColor)}
+                                            emoji={player.emoji}
+                                            onEmojiChange={(newEmoji) => handlePlayerEmojiChange(index, newEmoji)}
+                                            colors={availableColors}
+                                        />
+                                    </Box>
+                                    
+                                    {/* 2. Player Name TextField */}
                                     <TextField
                                         label={t('playerLabel', { index: index + 1 })}
                                         value={player.name}
                                         onChange={(e) => handlePlayerNameChange(index, e.target.value)}
-                                        required variant="outlined" size="small" 
+                                        required 
+                                        variant="outlined" 
+                                        size="small" 
                                         sx={{
                                             ...inputStyles, 
-                                            flexGrow: 1
+                                            flexGrow: 1,
+                                            mx: 1 // Add horizontal margin
                                         }}
                                     />
-                                    {/* MuiColorInput */}
-                                    <MuiColorInput
-                                        label={t('playerColorLabel')} value={player.color}
-                                        onChange={(newColor) => handlePlayerColorChange(index, newColor)}
-                                        format="hex" variant="outlined" size="small" isAlphaHidden
-                                        sx={{ 
-                                            width: '110px', // Keep overall width (or adjust slightly e.g., 115px)
-                                            // Base label/border styles
-                                            '& label.Mui-focused': { color: 'white' },
-                                            '& .MuiInputLabel-root': { color: 'silver' },
-                                            '& .MuiOutlinedInput-root': {
-                                                '& fieldset': { borderColor: 'silver' },
-                                                '&:hover fieldset': { borderColor: 'white' },
-                                                '&.Mui-focused fieldset': { borderColor: 'white' },
-                                            },
-                                            // Adjusted input styles to prevent overlap
-                                            '& .MuiInputBase-input': {
-                                                color: 'transparent',      // Hide text
-                                                caretColor: 'currentColor',// Show cursor
-                                                cursor: 'pointer',
-                                                width: 'auto', // Allow minimal width based on padding
-                                                paddingLeft: '1px', // Minimal padding left
-                                                paddingRight: '0px', // No padding right
-                                                // Removed marginLeft: '-8px' which might have caused overlap
-                                            }
-                                        }}
-                                    />
-                                    {/* Initial Offset TextField */}
-                                    <TextField
-                                        label={t('playerInitialOffsetLabel')} type="number" value={player.initial_offset}
-                                        onChange={(e) => handlePlayerOffsetChange(index, e.target.value)}
-                                        variant="outlined" size="small"
-                                        InputProps={{ startAdornment: <InputAdornment position="start">$</InputAdornment> }}
-                                        inputProps={{ step: "0.1" }} 
-                                        sx={{ ...inputStyles, width: 100 }}
-                                    />
+                                    
+                                    {/* 3. Initial Offset TextField */}
+                                    <Box sx={{ width: '100px', flexShrink: 0 }}> {/* Fixed width container */}
+                                        <TextField
+                                            label={t('playerInitialOffsetLabel')} 
+                                            type="number" 
+                                            value={player.initial_offset}
+                                            onChange={(e) => handlePlayerOffsetChange(index, e.target.value)}
+                                            variant="outlined" 
+                                            size="small"
+                                            InputProps={{ 
+                                                startAdornment: <InputAdornment position="start">$</InputAdornment> 
+                                            }}
+                                            inputProps={{ step: "0.1" }} 
+                                            sx={{ ...inputStyles, width: '100%' }}
+                                        />
+                                    </Box>
                                 </Box>
                             ))}
+
+                            {/* Add/Remove Player Buttons
+                            <Box sx={{ display: 'flex', justifyContent: 'space-between', mb: 2 }}>
+                                <Button 
+                                    variant="contained" 
+                                    onClick={addPlayer} 
+                                    disabled={players.length >= MAX_PLAYERS}
+                                    sx={{ ...whiteContainedButtonSx }}
+                                >
+                                    {t('addPlayerButton')}
+                                </Button>
+                                <Button 
+                                    variant="contained" 
+                                    onClick={removePlayer} 
+                                    disabled={players.length <= MIN_PLAYERS}
+                                    sx={{ ...whiteContainedButtonSx }}
+                                >
+                                    {t('removePlayerButton')}
+                                </Button>
+                            </Box> */}
 
                             {/* --- Game Rules --- */}
                             <Typography variant="h6" component="h2" gutterBottom sx={{mt: 3, color: 'white' }}>
@@ -390,48 +520,220 @@ const GameSetupPage: React.FC = () => {
                                     />
                                 </Grid>
                                 <Grid item xs={12}>
-                                    <FormControl fullWidth size="small" sx={{...inputStyles, minWidth: 120 }}>
-                                        <InputLabel>{t('maxMoneyLabel')} ($)</InputLabel>
-                                        <Select
-                                            name="max_money"
-                                            value={gameSettings.max_money}
-                                            label={`${t('maxMoneyLabel')} ($)`}
-                                            onChange={handleSettingChange}
+                                    <Box sx={{ width: '100%', mt: 1, mb: 2 }}>
+                                        <Typography variant="body2" color="silver" gutterBottom>
+                                            {t('maxMoneyLabel')} ($)
+                                        </Typography>
+                                        
+                                        <Box sx={{ 
+                                            display: 'flex', 
+                                            flexDirection: 'column',
+                                            alignItems: 'center',
+                                            px: 2
+                                        }}>
+                                            {/* Current value display */}
+                                            <Typography variant="h5" color="white" sx={{ mb: 1 }}>
+                                                ${gameSettings.max_money}
+                                            </Typography>
                                             
-                                        >
-                                            {maxMoneyOptions.map(opt => <MenuItem key={opt} value={opt}>{opt}</MenuItem>)}
-                                        </Select>
-                                    </FormControl>
+                                            <Slider
+                                                name="max_money"
+                                                value={gameSettings.max_money}
+                                                onChange={(_, value) => {
+                                                    setGameSettings(prev => ({
+                                                        ...prev,
+                                                        max_money: value as number
+                                                    }));
+                                                }}
+                                                step={null}
+                                                marks={maxMoneyOptions.map(value => ({ value, label: '' }))}
+                                                min={maxMoneyOptions[0]}
+                                                max={maxMoneyOptions[maxMoneyOptions.length - 1]}
+                                                sx={{
+                                                    width: '100%',
+                                                    color: 'white',
+                                                    '& .MuiSlider-rail': { backgroundColor: 'rgba(255, 255, 255, 0.3)' },
+                                                    '& .MuiSlider-track': { backgroundColor: 'white' },
+                                                    '& .MuiSlider-thumb': {
+                                                        backgroundColor: 'white',
+                                                        '&:hover, &.Mui-focusVisible': {
+                                                            boxShadow: '0 0 0 8px rgba(255, 255, 255, 0.16)'
+                                                        }
+                                                    },
+                                                    '& .MuiSlider-mark': { backgroundColor: 'silver', height: 4 },
+                                                    '& .MuiSlider-markActive': { backgroundColor: 'white' }
+                                                }}
+                                            />
+                                            
+                                            {/* Range indicators */}
+                                            <Box sx={{ 
+                                                display: 'flex', 
+                                                justifyContent: 'space-between', 
+                                                width: '100%', 
+                                                mt: 0.5 
+                                            }}>
+                                                <Typography variant="caption" color="silver">${maxMoneyOptions[0]}</Typography>
+                                                <Typography variant="caption" color="silver">${maxMoneyOptions[maxMoneyOptions.length - 1]}</Typography>
+                                            </Box>
+                                        </Box>
+                                    </Box>
                                 </Grid>
                                 <Grid item xs={12}>
-                                    <FormControl fullWidth size="small" sx={{...inputStyles, minWidth: 120 }}>
-                                        <InputLabel>{t('maxScoreLabel')}</InputLabel>
-                                        <Select
-                                            name="upper_limit_of_score"
-                                            value={gameSettings.upper_limit_of_score}
-                                            label={t('maxScoreLabel')}
-                                            onChange={handleSettingChange}
+                                    <Box sx={{ width: '100%', mt: 1, mb: 2 }}>
+                                        <Typography variant="body2" color="silver" gutterBottom>
+                                            {t('maxScoreLabel')} ({t('Faan')})
+                                        </Typography>
+                                        
+                                        <Box sx={{ 
+                                            display: 'flex', 
+                                            flexDirection: 'column',
+                                            alignItems: 'center',
+                                            px: 2
+                                        }}>
+                                            <Typography variant="h5" color="white" sx={{ mb: 1 }}>
+                                                {gameSettings.upper_limit_of_score}
+                                            </Typography>
                                             
-                                        >
-                                            {scoreLimitOptions.map(opt => <MenuItem key={opt} value={opt}>{opt}</MenuItem>)}
-                                        </Select>
-                                    </FormControl>
+                                            <Slider
+                                                name="upper_limit_of_score"
+                                                value={gameSettings.upper_limit_of_score}
+                                                onChange={(_, value) => {
+                                                    const newValue = value as number;
+                                                    setGameSettings(prev => {
+                                                        // Ensure lower limit isn't higher than upper limit
+                                                        const lowerLimit = Math.min(prev.lower_limit_of_score, newValue);
+                                                        return {
+                                                            ...prev,
+                                                            upper_limit_of_score: newValue,
+                                                            lower_limit_of_score: lowerLimit
+                                                        };
+                                                    });
+                                                }}
+                                                step={1}
+                                                marks
+                                                min={3}
+                                                max={30}
+                                                sx={{
+                                                    width: '100%',
+                                                    color: 'white',
+                                                    '& .MuiSlider-rail': { backgroundColor: 'rgba(255, 255, 255, 0.3)' },
+                                                    '& .MuiSlider-track': { backgroundColor: 'white' },
+                                                    '& .MuiSlider-thumb': {
+                                                        backgroundColor: 'white',
+                                                        '&:hover, &.Mui-focusVisible': {
+                                                            boxShadow: '0 0 0 8px rgba(255, 255, 255, 0.16)'
+                                                        }
+                                                    },
+                                                    '& .MuiSlider-markActive': { backgroundColor: 'white' }
+                                                }}
+                                            />
+                                            
+                                            <Box sx={{ 
+                                                display: 'flex', 
+                                                justifyContent: 'space-between', 
+                                                width: '100%', 
+                                                mt: 0.5 
+                                            }}>
+                                                <Typography variant="caption" color="silver">3</Typography>
+                                                <Typography variant="caption" color="silver">30</Typography>
+                                            </Box>
+                                        </Box>
+                                    </Box>
                                 </Grid>
                                 <Grid item xs={12}>
-                                    <FormControl fullWidth size="small" sx={{...inputStyles, minWidth: 120 }}>
-                                        <InputLabel>{t('minScoreLabel')}</InputLabel>
-                                        <Select
-                                            name="lower_limit_of_score"
-                                            value={gameSettings.lower_limit_of_score}
-                                            label={t('minScoreLabel')}
-                                            onChange={handleSettingChange}
+                                    <Box sx={{ width: '100%', mt: 1, mb: 2 }}>
+                                        <Typography variant="body2" color="silver" gutterBottom>
+                                            {t('minScoreLabel')} ({t('Faan')})
+                                        </Typography>
+                                        
+                                        <Box sx={{ 
+                                            display: 'flex', 
+                                            flexDirection: 'column',
+                                            alignItems: 'center',
+                                            px: 2
+                                        }}>
+                                            <Typography variant="h5" color="white" sx={{ mb: 1 }}>
+                                                {gameSettings.lower_limit_of_score}
+                                            </Typography>
                                             
-                                        >
-                                            {minScoreOptions.map(opt => <MenuItem key={opt} value={opt}>{opt}</MenuItem>)}
-                                        </Select>
+                                            <Slider
+                                                name="lower_limit_of_score"
+                                                value={gameSettings.lower_limit_of_score}
+                                                onChange={(_, value) => {
+                                                    setGameSettings(prev => ({
+                                                        ...prev,
+                                                        lower_limit_of_score: value as number
+                                                    }));
+                                                }}
+                                                step={1}
+                                                marks
+                                                min={1}
+                                                max={gameSettings.upper_limit_of_score}
+                                                sx={{
+                                                    width: '100%',
+                                                    color: 'white',
+                                                    '& .MuiSlider-rail': { backgroundColor: 'rgba(255, 255, 255, 0.3)' },
+                                                    '& .MuiSlider-track': { backgroundColor: 'white' },
+                                                    '& .MuiSlider-thumb': {
+                                                        backgroundColor: 'white',
+                                                        '&:hover, &.Mui-focusVisible': {
+                                                            boxShadow: '0 0 0 8px rgba(255, 255, 255, 0.16)'
+                                                        }
+                                                    },
+                                                    '& .MuiSlider-markActive': { backgroundColor: 'white' }
+                                                }}
+                                            />
+                                            
+                                            <Box sx={{ 
+                                                display: 'flex', 
+                                                justifyContent: 'space-between', 
+                                                width: '100%', 
+                                                mt: 0.5 
+                                            }}>
+                                                <Typography variant="caption" color="silver">1</Typography>
+                                                <Typography variant="caption" color="silver">{gameSettings.upper_limit_of_score}</Typography>
+                                            </Box>
+                                        </Box>
+                                    </Box>
+                                </Grid>
+                                <Grid item xs={12} sx={{ mt: 2 }}>
+                                    <Typography variant="body2" color="silver" gutterBottom>
+                                        {t('scoreTypeLabel')}
+                                    </Typography>
+                                    
+                                    <FormControl component="fieldset">
+                                        <Box sx={{ display: 'flex', gap: 4 }}>
+                                            <Box sx={{ display: 'flex', alignItems: 'center' }}>
+                                                <Radio
+                                                    checked={gameSettings.half_money_rule}
+                                                    onChange={() => setGameSettings(prev => ({ ...prev, half_money_rule: true }))}
+                                                    value="true"
+                                                    name="half_money_rule"
+                                                    sx={{
+                                                        color: 'silver',
+                                                        '&.Mui-checked': { color: 'white' },
+                                                    }}
+                                                />
+                                                <Typography color="white">{t('halfAfter5Rule')}</Typography>
+                                            </Box>
+                                            
+                                            <Box sx={{ display: 'flex', alignItems: 'center' }}>
+                                                <Radio
+                                                    checked={!gameSettings.half_money_rule}
+                                                    onChange={() => setGameSettings(prev => ({ ...prev, half_money_rule: false }))}
+                                                    value="false"
+                                                    name="half_money_rule"
+                                                    sx={{
+                                                        color: 'silver',
+                                                        '&.Mui-checked': { color: 'white' },
+                                                    }}
+                                                />
+                                                <Typography color="white">{t('hotHotUpRule')}</Typography>
+                                            </Box>
+                                        </Box>
                                     </FormControl>
                                 </Grid>
-                                <Grid item xs={12}>
+                                {/* <Grid item xs={12}>
                                     <FormControl fullWidth size="small" sx={{...inputStyles, minWidth: 120 }}>
                                         <InputLabel>{t('scoreTypeLabel')}</InputLabel>
                                         <Select
@@ -444,8 +746,44 @@ const GameSetupPage: React.FC = () => {
                                             <MenuItem value="false">{t('hotHotUpRule')}</MenuItem>
                                         </Select>
                                     </FormControl>
+                                </Grid> */}
+                                <Grid item xs={12} sx={{ mt: 2 }}>
+                                    <Typography variant="body2" color="silver" gutterBottom>
+                                        {t('paymentRuleLabel')}
+                                    </Typography>
+                                    
+                                    <FormControl component="fieldset">
+                                        <Box sx={{ display: 'flex', gap: 4 }}>
+                                            <Box sx={{ display: 'flex', alignItems: 'center' }}>
+                                                <Radio
+                                                    checked={!gameSettings.one_pay_all_rule}
+                                                    onChange={() => setGameSettings(prev => ({ ...prev, one_pay_all_rule: false }))}
+                                                    value="true"
+                                                    name="one_pay_all_rule"
+                                                    sx={{
+                                                        color: 'silver',
+                                                        '&.Mui-checked': { color: 'white' },
+                                                    }}
+                                                />
+                                                <Typography color="white">{t("fullTungRule")}</Typography>
+                                            </Box>
+                                            
+                                            <Box sx={{ display: 'flex', alignItems: 'center' }}>
+                                                <Radio
+                                                    checked={gameSettings.one_pay_all_rule}
+                                                    onChange={() => setGameSettings(prev => ({ ...prev, one_pay_all_rule: true }))}
+                                                    value="false"
+                                                    name="one_pay_all_rule"
+                                                    sx={{
+                                                        color: 'silver',
+                                                        '&.Mui-checked': { color: 'white' },
+                                                    }}
+                                                />
+                                                <Typography color="white">{t("halfTungRule")}</Typography>
+                                            </Box>
+                                        </Box>
+                                    </FormControl>
                                 </Grid>
-                            
                             </Grid>
 
                             {/* --- Error Display --- */}
@@ -461,7 +799,7 @@ const GameSetupPage: React.FC = () => {
                                 disabled={isLoading}
                                 variant="contained"
                                 size="large"
-                                sx={{ mt: 2, mb: 2 , backgroundColor: 'white', color: 'black', '&:hover': { backgroundColor: '#f0f0f0' } }}
+                                sx={{ ...whiteContainedButtonSx, mt: 2, mb: 2 }}
                             >
                                 {isLoading ? t('creatingGameButton') : t('createGameButton')}
                             </Button>

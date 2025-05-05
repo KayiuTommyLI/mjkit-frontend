@@ -8,7 +8,7 @@
     "playerLabel": "Player {{index}}",
     "playerNameHint": "Player Name",
     "playerColorLabel": "Color",
-    "playerInitialOffsetLabel": "Initial Offset",
+    "playerInitialOffsetLabel": "Initial Offset ($)",
 
     "gameRulesLabel": "Game Rules",
     "gameNameLabel": "Game Name (Optional)",
@@ -22,20 +22,92 @@
     "moneyLabel": "${{money}}",
     "halfAfter5Rule": "Half Money After 5",
     "hotHotUpRule": "Hot Hot Up",
+    "paymentRuleLabel": "Payment Rule",
+    "fullTungRule": "One Pay All",
+    "halfTungRule": "Everyone Need Pay",
+
+    "playerCountLabel": "Number of Players: {{count}}",
+    
     "createGameButton": "Create Game",
     "langEnglish": "English",
     "langChinese": "繁體中文",
     "loadingGame": "Loading Game...",
-    "errorLoadingGame": "Failed to load game: {{error}}",
     "gameStatusLabel": "Status",
     "creatingGameButton": "Creating Game...",
+    "newGameSetupButtonLabel": "New Game Setup",
+    "scoreRefButtonLabel": "Score Reference",
 
     "SuccessGameCreation": "Game created! ID: {{game_id}}. Redirecting soon...",
 
+    "gameDefaultTitle": "Tonight Game",
+    "gameRuleSummary": "Game Rules: Max: {{max}} Faan, Min: {{min}} Faan, Max Money: ${{maxMoney}}, Scoring Rule: {{rule}}",
+
+    "activePlayersHeader": "Active Players",
+    "noActivePlayers": "No enough active players.",
+    "balanceLabel": "Balance",
+    "addRoundButtonLabel": "Add Round",
+
+    "hideScoreTableButton": "Hide Score Table",
+    "showScoreTableButton": "Show Score Table",
+
+    "scoreRefTableAriaLabel": "Score Reference Table",
+
+    "thisGameNoDataYet": "No data available for this game yet.",
+
+    "roundHistoryHeader": "Round History",
+    "roundHistoryEmpty": "No rounds played yet.",
+
+    "deleteButtonLabel": "Delete",
+    "deleteConfirmTitle": "Are you sure you want to delete this round? Round {{roundNumber}, {{score}} Faan, {{player}} won ${{money}}",
+    "deleteConfirmMessage": "This DELETE action cannot be undone.",
+
+    "cancel": "Cancel",
+    "deleting": "Deleting...",
+
+    "addRoundResult": "Add Round Result",
+    "winnerLabel": "Winner",
+    "loserLabel": "Loser",
+    "winTypeLabel": "Win Type",
+    "winTypeNormal": "Normal Win",
+    "winTypeSelfDrawAll": "Self-Draw (All)",
+    "winTypeSelfDrawOne": "Self-Draw (One)",
+
+    "selectLoser": "Select Loser",
+
+    "submitting": "Submitting...",
+    "sumbitRound": "Submit Round Result",
+
+    "gameError": "Error: {{error}}",
+
+    "errorLoadingGame": "Failed to load game: {{error}}",
     "errorCreateGame": "Error: Failed to create game.",
     "errorOffsetSum": "Error: The sum of all initial player offsets must be zero.",
     "errorMinGreaterMax": "Minimum score cannot be greater than maximum score.",
     "errorPlayerNameUnique": "Error: Player names must be unique.",
     "errorPlayerNameEmpty": "Error: Player name cannot be empty.",
-    "errorInvalidScoreLimit": "Error: Invalid score limits"
+    "errorInvalidScoreLimit": "Error: Invalid score limits",
+    "errorNoGameId": "Error: No Game ID provided in URL.",
+    "errorCannotStartNoId": "Error: Cannot start game without a valid game ID.",
+    "errorDeleteFailed": "Error: Failed to delete round.",
+    "errorGameNotFound": "Error: Game not found.",
+
+    "errorWinnerRequired": "Error: Winner is required.",
+    "errorLoserRequired": "Error: Loser is required.",
+    "errorScoreRange": "Error: Score must be between {{min}} and {{max}}.",
+
+    "errorGameMasterToken": "Error: Game master token is missing.",
+    "errorSubmitFailed": "Error: Failed to submit round data.",
+
+    "errorNoValidScores": "Error: No valid scores available.",
+
+    "warningRefreshFailed": "Warning: Could not refresh game data, {{error}}",
+
+    "backButtonLabel": "Back",
+    "scoreRefTitle": "Score Reference Table",
+    "scoreRefDescription": "Select the game rules to see the corresponding money value per Faan score.",
+    "scoreRefTableHeader": "Score Reference Table",
+    "scoreRefFaanHeader": "Faan",
+    "scoreRefMoneyHeader": "$",
+    "scoreRefNoData": "No score data available for selected settings."
+
   }

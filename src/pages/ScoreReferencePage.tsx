@@ -23,6 +23,23 @@ import CircularProgress from '@mui/material/CircularProgress';
 import Alert from '@mui/material/Alert';
 import ArrowBackIcon from '@mui/icons-material/ArrowBack';
 import { API_URL } from '../config';
+import { useTranslation } from 'react-i18next';
+import { inputStyles } from '../styles/formStyles';
+
+// const inputStyles = {
+//     minWidth: 120, // Ensure minimum width for selects
+//     '& label.Mui-focused': { color: 'white' },
+//     '& .MuiInputLabel-root': { color: 'silver' },
+//     '& .MuiOutlinedInput-root': {
+//         '& fieldset': { borderColor: 'silver' },
+//         '&:hover fieldset': { borderColor: 'white' },
+//         '&.Mui-focused fieldset': { borderColor: 'white' },
+//         '& input': { color: 'white' },
+//         '& .MuiSelect-select': { color: 'white' },
+//         '& .MuiSvgIcon-root': { color: 'silver'}
+//     },
+//      '& .MuiInputAdornment-root p': { color: 'silver' }
+// };
 
 // Interface for the score preview data item from API
 interface ScorePreviewItem {
@@ -35,12 +52,13 @@ const defaultMaxMoney = 64;
 const defaultUpperLimit = 10;
 const defaultLowerLimit = 3;
 const defaultHalfMoneyRule = true;
-const maxMoneyOptions = [16, 24, 32, 48, 64, 96, 128];
-const scoreLimitOptions = Array.from({ length: 18 }, (_, i) => i + 3); // 3 to 20
-const minScoreOptions = Array.from({ length: 5 }, (_, i) => i + 1); // 1 to 5
+const maxMoneyOptions = [8, 16, 24, 32, 48, 64, 96, 128, 256, 512, 1024];  // 8 to 1024
+const scoreLimitOptions = Array.from({ length: 28 }, (_, i) => i + 3);  // 3 to 30
+const minScoreOptions = Array.from({ length: 8 }, (_, i) => i + 1);  // 1 to 8
 
 const ScoreReferencePage: React.FC = () => {
     const navigate = useNavigate();
+    const { t, i18n } = useTranslation(); // Initialize useTranslation
 
     // State for selected settings
     const [settings, setSettings] = useState({
@@ -105,7 +123,7 @@ const ScoreReferencePage: React.FC = () => {
         } finally {
             setLoading(false);
         }
-    }, [settings]); // Dependency array includes settings
+    }, [settings, t]); // Dependency array includes settings
 
     // Fetch data initially and whenever settings change
     useEffect(() => {
@@ -113,23 +131,40 @@ const ScoreReferencePage: React.FC = () => {
     }, [fetchScoreTable]);
 
     return (
-        <Container maxWidth="sm" sx={{ mt: 4, mb: 4 }}>
-             <Button variant="outlined" onClick={() => navigate(-1)} sx={{ mb: 2 }} startIcon={<ArrowBackIcon />}>
-                 Back
-             </Button>
-            <Paper elevation={3} sx={{ p: 3 }}>
-                <Typography variant="h4" component="h1" gutterBottom>
-                    Score Reference Table
+        <Container maxWidth="sm" sx={{ mt: {xs: 2, sm: 4}, mb: 4 }}>
+            <Button
+            variant="outlined"
+            onClick={() => navigate(-1)}
+            sx={{ // Style back button like inactive language button
+                mb: 2,
+                color: 'silver',
+                borderColor: 'silver',
+                '&:hover': { color: 'white', borderColor: 'white', backgroundColor: 'rgba(255, 255, 255, 0.08)' }
+                }}
+            startIcon={<ArrowBackIcon />}
+            >
+                {t('backButtonLabel')}
+            </Button>
+            <Paper
+                elevation={0} // No shadow for transparent
+                sx={{
+                    p: 3,
+                    backgroundColor: 'transparent', // Match theme
+                    color: 'white', // Match theme
+                }}
+            >
+                <Typography variant="h4" component="h1" gutterBottom sx={{ color: 'white' }}>
+                    {t('scoreRefTitle')} {/* Translate */}
                 </Typography>
-                <Typography variant="body2" color="text.secondary" sx={{ mb: 2 }}>
-                    Select the game rules to see the corresponding money value per Faan score.
+                <Typography variant="body2" sx={{ mb: 2, color: 'silver' }}> {/* Translate */}
+                    {t('scoreRefDescription')}
                 </Typography>
 
                 {/* Settings Selection Grid */}
                 <Grid container spacing={2} sx={{ mb: 3 }}>
-                     <Grid item xs={6} sm={3} {...({} as any)}>
-                          <FormControl fullWidth size="small">
-                             <InputLabel id="max-money-label">Max Money</InputLabel>
+                     <Grid item xs={6} sm={3}>
+                          <FormControl fullWidth size="small" sx={inputStyles}>
+                             <InputLabel id="max-money-label">{t('maxMoneyLabel')}</InputLabel>
                              <Select
                                  labelId="max-money-label"
                                  name="max_money"
@@ -141,9 +176,9 @@ const ScoreReferencePage: React.FC = () => {
                              </Select>
                          </FormControl>
                      </Grid>
-                     <Grid item xs={6} sm={3} {...({} as any)}>
-                          <FormControl fullWidth size="small">
-                             <InputLabel id="max-score-label">Max Score</InputLabel>
+                     <Grid item xs={6} sm={3}>
+                          <FormControl fullWidth size="small" sx={inputStyles}>
+                             <InputLabel id="max-score-label">{t('maxScoreLabel')}</InputLabel>
                              <Select
                                  labelId="max-score-label"
                                  name="upper_limit_of_score"
@@ -155,9 +190,9 @@ const ScoreReferencePage: React.FC = () => {
                              </Select>
                          </FormControl>
                      </Grid>
-                      <Grid item xs={6} sm={3} {...({} as any)}>
-                          <FormControl fullWidth size="small">
-                             <InputLabel id="min-score-label">Min Score</InputLabel>
+                      <Grid item xs={6} sm={3}>
+                          <FormControl fullWidth size="small" sx={inputStyles}>
+                             <InputLabel id="min-score-label">{t('minScoreLabel')}</InputLabel>
                              <Select
                                  labelId="min-score-label"
                                  name="lower_limit_of_score"
@@ -169,9 +204,9 @@ const ScoreReferencePage: React.FC = () => {
                              </Select>
                          </FormControl>
                      </Grid>
-                      <Grid item xs={6} sm={3} {...({} as any)}>
-                         <FormControl fullWidth size="small">
-                             <InputLabel id="score-rule-label">Score Rule</InputLabel>
+                      <Grid item xs={6} sm={3}>
+                         <FormControl fullWidth size="small" sx={inputStyles}>
+                             <InputLabel id="score-rule-label">{t('scoreTypeLabel')}</InputLabel>
                              <Select
                                  labelId="score-rule-label"
                                  name="half_money_rule"
@@ -179,27 +214,27 @@ const ScoreReferencePage: React.FC = () => {
                                  label="Score Rule"
                                  onChange={handleSettingChange}
                              >
-                                 <MenuItem value="true">Half After 5</MenuItem>
-                                 <MenuItem value="false">Hot Hot Up</MenuItem>
+                                 <MenuItem value="true">{t('halfAfter5Rule')}</MenuItem>
+                                 <MenuItem value="false">{t('hotHotUpRule')}</MenuItem>
                              </Select>
                          </FormControl>
                      </Grid>
                 </Grid>
 
                 {/* Score Table Display */}
-                <Typography variant="h6" component="h2" gutterBottom>
-                    Score Table
+                <Typography variant="h6" component="h2" gutterBottom sx={{ color: 'white' }}>
+                    {t('scoreRefTableHeader')}
                 </Typography>
                 {error && <Alert severity="error" sx={{ mb: 2 }}>{error}</Alert>}
-                <TableContainer component={Paper} variant="outlined">
-                    <Table size="small" aria-label="score reference table">
-                        <TableHead sx={{ backgroundColor: 'action.hover' }}>
+                <TableContainer component={Paper} variant="outlined" sx={{ backgroundColor: 'transparent', borderColor: 'rgba(192, 192, 192, 0.5)'}}>
+                    <Table size="small" aria-label={t('scoreRefTableAriaLabel')}>
+                        {/* <TableHead sx={{ backgroundColor: 'action.hover' }}>
                             <TableRow>
-                                <TableCell sx={{ fontWeight: 'bold' }}>Faan (Score)</TableCell>
-                                <TableCell align="right" sx={{ fontWeight: 'bold' }}>Money ($)</TableCell>
+                                <TableCell sx={{ fontWeight: 'bold', color: 'white', borderBottomColor: 'rgba(192, 192, 192, 0.5)' }}>{t('scoreRefFaanHeader')}</TableCell>
+                                <TableCell align="right" sx={{ fontWeight: 'bold', color: 'white', borderBottomColor: 'rgba(192, 192, 192, 0.5)' }}>{t('scoreRefMoneyHeader')}</TableCell>
                             </TableRow>
-                        </TableHead>
-                        <TableBody>
+                        </TableHead> */}
+                        <TableBody sx={{ color: 'silver' }}>
                             {loading ? (
                                 <TableRow>
                                     <TableCell colSpan={2} align="center">
@@ -209,16 +244,16 @@ const ScoreReferencePage: React.FC = () => {
                             ) : scoreTable.length > 0 ? (
                                 scoreTable.map((item) => (
                                     <TableRow key={item.score} sx={{ '&:last-child td, &:last-child th': { border: 0 } }}>
-                                        <TableCell component="th" scope="row">
-                                            {item.score} Faan
+                                        <TableCell component="th" scope="row" sx={{ color: 'silver', borderBottomColor: 'rgba(192, 192, 192, 0.3)' }}>
+                                            {item.score} {t('Faan')}
                                         </TableCell>
-                                        <TableCell align="right">${item.money.toFixed(1)}</TableCell>
+                                        <TableCell align="right" sx={{ color: 'white', borderBottomColor: 'rgba(192, 192, 192, 0.3)' }}>${item.money.toFixed(1)}</TableCell>
                                     </TableRow>
                                 ))
                             ) : (
                                 <TableRow>
-                                     <TableCell colSpan={2} align="center">
-                                         No score data available for selected settings.
+                                     <TableCell colSpan={2} align="center" sx={{ color: 'silver' }}>
+                                        {t('scoreRefNoData')}No score data available for selected settings.
                                      </TableCell>
                                 </TableRow>
                             )}

@@ -6,7 +6,8 @@ import DialogActions from '@mui/material/DialogActions';
 import DialogContent from '@mui/material/DialogContent';
 import DialogContentText from '@mui/material/DialogContentText';
 import DialogTitle from '@mui/material/DialogTitle';
-import { CircularProgress } from '@mui/material';
+import { CircularProgress, Paper } from '@mui/material';
+import { useTranslation } from 'react-i18next';
 
 interface ConfirmationDialogProps {
   open: boolean;
@@ -29,22 +30,48 @@ const ConfirmationDialog: React.FC<ConfirmationDialogProps> = ({
   cancelText = 'Cancel',
   isConfirming = false, // Default to not loading
 }) => {
+  const { t } = useTranslation(); 
+
   return (
     <Dialog
       open={open}
       onClose={onClose}
       aria-labelledby="confirmation-dialog-title"
       aria-describedby="confirmation-dialog-description"
+      PaperComponent={props => (
+        <Paper 
+          {...props} 
+          sx={{ 
+            backgroundColor: 'rgba(36, 36, 36, 0.95)', 
+            color: 'white',
+            borderRadius: 1,
+            border: '1px solid rgba(192, 192, 192, 0.3)',
+          }} 
+        />
+      )}
     >
-      <DialogTitle id="confirmation-dialog-title">{title}</DialogTitle>
-      <DialogContent>
-        <DialogContentText id="confirmation-dialog-description">
+      <DialogTitle id="confirmation-dialog-title" 
+        sx={{ borderBottom: '1px solid rgba(192, 192, 192, 0.2)' }}
+      >
+        {title}
+      </DialogTitle>
+      <DialogContent sx={{ mt: 2 }}>
+        <DialogContentText id="confirmation-dialog-description" sx={{ color: 'silver' }}>
           {message}
         </DialogContentText>
       </DialogContent>
-      <DialogActions sx={{ p: '16px 24px' }}>
-        <Button onClick={onClose} color="inherit">
-          {cancelText}
+      <DialogActions sx={{ p: '16px 24px', borderTop: '1px solid rgba(192, 192, 192, 0.2)' }}>
+        <Button 
+          onClick={onClose} 
+          sx={{ 
+            color: 'silver', 
+            '&:hover': { 
+              color: 'white', 
+              backgroundColor: 'rgba(255, 255, 255, 0.08)' 
+            }
+          }}
+        >
+          {cancelText || t('cancel')}
         </Button>
         <Button
             onClick={onConfirm}
@@ -52,7 +79,13 @@ const ConfirmationDialog: React.FC<ConfirmationDialogProps> = ({
             variant="contained"
             disabled={isConfirming} // Disable confirm button while loading
             autoFocus
-            startIcon={isConfirming ? <CircularProgress size={20} color="inherit" /> : null} // Show spinner
+            startIcon={isConfirming ? <CircularProgress size={20} color="inherit" /> : null}
+            sx={{
+              backgroundColor: theme => theme.palette.error.dark,
+              '&:hover': {
+                backgroundColor: theme => theme.palette.error.main,
+              }
+            }}
         >
         {/* Change button text while confirming */}
         {isConfirming ? 'Deleting...' : confirmText}

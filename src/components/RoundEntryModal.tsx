@@ -16,7 +16,10 @@ import Alert from '@mui/material/Alert';
 import Box from '@mui/material/Box';
 import Grid from '@mui/material/Grid';
 import Typography from '@mui/material/Typography';
+import { Paper, Slider } from '@mui/material';
 import { API_URL } from '../config';
+import { useTranslation } from 'react-i18next';
+import { inputStyles } from '../styles/formStyles';
 
 // Define WinType enum matching your backend
 export enum WinType {
@@ -43,6 +46,20 @@ interface RoundEntryModalProps {
     scoreLimits: ScoreLimitsForModal;
 }
 
+// // Common input styles - matching main application theme
+// const inputStyles = { 
+//     '& label.Mui-focused': { color: 'white' },
+//     '& .MuiInputLabel-root': { color: 'silver' }, 
+//     '& .MuiOutlinedInput-root': {
+//         '& fieldset': { borderColor: 'silver' }, 
+//         '&:hover fieldset': { borderColor: 'white' },
+//         '&.Mui-focused fieldset': { borderColor: 'white' },
+//         '& input': { color: 'white' },
+//         '& .MuiSelect-select': { color: 'white' }, 
+//         '& .MuiSvgIcon-root': { color: 'silver'} 
+//     }
+// };
+
 const RoundEntryModal: React.FC<RoundEntryModalProps> = ({
     open,
     onClose,
@@ -51,6 +68,8 @@ const RoundEntryModal: React.FC<RoundEntryModalProps> = ({
     activePlayers = [],
     scoreLimits = { min: 1, max: 1 }
 }) => {
+    const { t } = useTranslation();
+
     // Form State
     const [winnerId, setWinnerId] = useState<string>('');
     const [loserId, setLoserId] = useState<string>('');
@@ -121,10 +140,10 @@ const RoundEntryModal: React.FC<RoundEntryModalProps> = ({
     const handleSubmit = async () => {
         setError(null);
         // Validation
-        if (!winnerId) { setError('Winner is required.'); return; }
-        if (isLoserRequired && !loserId) { setError('Loser is required for this win type.'); return; }
+        if (!winnerId) { setError(t('errorWinnerRequired')); return; }
+        if (isLoserRequired && !loserId) { setError(t('errorLoserRequired')); return; }
         if (!scoreOptions.includes(scoreValue)) { setError(`Score must be between ${scoreLimits.min} and ${scoreLimits.max}.`); return; }
-        if (!gameId) { setError('Game ID is missing.'); return; }
+        if (!gameId) { setError(t('errorGameNotFound', {min: scoreLimits.min, max: scoreLimits.max})); return; }
 
         setIsLoading(true);
 
@@ -137,7 +156,7 @@ const RoundEntryModal: React.FC<RoundEntryModalProps> = ({
 
         const gameMasterToken = localStorage.getItem(`gameMasterToken_${gameId}`);
         if (!gameMasterToken) {
-            setError('Game Master Token not found. Please ensure the game was started correctly.'); // <-- Set error state
+            setError(t('errorGameMasterTokenMissing'));
             setIsLoading(false); // <-- Stop loading
             return; // <-- Exit function
         }
@@ -146,7 +165,7 @@ const RoundEntryModal: React.FC<RoundEntryModalProps> = ({
         console.log("Using game master token: Present");
 
         try {
-            const response = await fetch(`<span class="math-inline">${API_URL}/games/</span>{gameId}/rounds`, { 
+            const response = await fetch(`${API_URL}/games/${gameId}/rounds`, { 
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
@@ -165,7 +184,7 @@ const RoundEntryModal: React.FC<RoundEntryModalProps> = ({
             onClose();
         } catch (err: any) { 
             console.error("Failed to submit round:", err);
-            setError(err.message || 'Failed to submit round.');
+            setError(err.message || t('errorSubmitFailed'));
          }
         finally { setIsLoading(false); }
     };
@@ -178,20 +197,40 @@ const RoundEntryModal: React.FC<RoundEntryModalProps> = ({
 
     // --- Render ---
     return (
-        <Dialog open={open} onClose={onClose} maxWidth="xs" fullWidth>
-            <DialogTitle>Add Round Result</DialogTitle>
-            <DialogContent>
+        <Dialog 
+            open={open} 
+            onClose={onClose} 
+            maxWidth="xs" 
+            fullWidth
+            PaperComponent={props => (
+                <Paper 
+                  {...props} 
+                  sx={{ 
+                    backgroundColor: 'rgba(36, 36, 36, 0.95)', 
+                    color: 'white',
+                    borderRadius: 1,
+                    border: '1px solid rgba(192, 192, 192, 0.3)'
+                  }} 
+                />
+            )}
+        >
+            <DialogTitle sx={{ borderBottom: '1px solid rgba(192, 192, 192, 0.2)' }}>
+                {t('addRoundResult')}
+            </DialogTitle>
+            <DialogContent sx={{ mt: 2 }}>
                  <Box component="form" noValidate sx={{ mt: 1 }}>
                     {/* Use Grid container for overall form layout */}
                     <Grid container spacing={2}>
                         {/* Winner Select */}
                         <Grid item xs={12} sm={8} {...({} as any)}>
-                            <FormControl fullWidth required margin="dense" disabled={!activePlayers.length || isLoading}>
-                                <InputLabel id="winner-label">Winner</InputLabel>
+                            <FormControl fullWidth required margin="dense" disabled={!activePlayers.length || isLoading} sx={inputStyles}>
+                                <InputLabel id="winner-label">
+                                    {t("winnerLabel")}
+                                </InputLabel>
                                 <Select
                                     labelId="winner-label"
                                     value={winnerId}
-                                    label="Winner"
+                                    label= {t("winnerLabel")}
                                     onChange={handleWinnerChange}
                                     sx={{
                                         '& .MuiSelect-select': {
@@ -212,23 +251,56 @@ const RoundEntryModal: React.FC<RoundEntryModalProps> = ({
                         {/* Win Type Radio */}
                         <Grid item xs={12} sm={8} {...({} as any)}>
                             <FormControl component="fieldset" margin="dense" disabled={isLoading}>
-                                <Typography component="legend" variant="body2" sx={{ mb: 0.5 }}>Win Type</Typography>
+                                <Typography component="legend" variant="body2" sx={{ mb: 0.5, color: 'silver'  }}>
+                                    {t("winTypeLabel")}
+                                </Typography>
                                 <RadioGroup row name="win_type" value={winType} onChange={handleWinTypeChange}>
-                                    <FormControlLabel value={WinType.NORMAL} control={<Radio size="small"/>} label="Normal" sx={{ mr: 0.5 }}/>
-                                    <FormControlLabel value={WinType.SELF_DRAW_ALL_PAY} control={<Radio size="small"/>} label="Self-Draw (All)" sx={{ mr: 0.5 }}/>
-                                    <FormControlLabel value={WinType.SELF_DRAW_ONE_PAY} control={<Radio size="small"/>} label="Self-Draw (One)" />
+                                    <FormControlLabel 
+                                        value={WinType.NORMAL} 
+                                        control={<Radio size="small" sx={{ 
+                                            color: 'silver',
+                                            '&.Mui-checked': { color: 'white' }
+                                        }}/>} 
+                                        label={<Typography sx={{ color: 'silver' }}>
+                                            {t("winTypeNormal")}
+                                            </Typography>} 
+                                        sx={{ mr: 0.5 }}
+                                    />
+                                    <FormControlLabel 
+                                        value={WinType.SELF_DRAW_ALL_PAY} 
+                                        control={<Radio size="small" sx={{ 
+                                            color: 'silver',
+                                            '&.Mui-checked': { color: 'white' }
+                                        }}/>} 
+                                        label={<Typography sx={{ color: 'silver' }}>
+                                            {t("winTypeSelfDrawAll")}
+                                            </Typography>} 
+                                        sx={{ mr: 0.5 }}
+                                    />
+                                    <FormControlLabel 
+                                        value={WinType.SELF_DRAW_ONE_PAY} 
+                                        control={<Radio size="small" sx={{ 
+                                            color: 'silver',
+                                            '&.Mui-checked': { color: 'white' }
+                                        }}/>} 
+                                        label={<Typography sx={{ color: 'silver' }}>
+                                            {t("winTypeSelfDrawOne")}
+                                        </Typography>} 
+                                    />
                                 </RadioGroup>
                             </FormControl>
                         </Grid>
 
                         {/* Loser Select */}
                         <Grid item xs={12} sm={8} {...({} as any)}>
-                            <FormControl fullWidth required={isLoserRequired} margin="dense" disabled={!isLoserRequired || isLoading}>
-                                <InputLabel id="loser-label">Loser</InputLabel>
+                            <FormControl fullWidth required={isLoserRequired} margin="dense" disabled={!isLoserRequired || isLoading} sx={inputStyles}>
+                                <InputLabel id="loser-label">
+                                        {isLoserRequired ? t('loserLabel') : t('notApplicable')}
+                                </InputLabel>
                                 <Select
                                     labelId="loser-label"
                                     value={loserId ?? ''}
-                                    label="Loser"
+                                    label={t('loserLabel')}
                                     onChange={handleLoserChange}
                                     sx={{
                                         '& .MuiSelect-select': {
@@ -238,7 +310,7 @@ const RoundEntryModal: React.FC<RoundEntryModalProps> = ({
                                     }}
                                 >
                                     <MenuItem value="" disabled>
-                                        <em>{isLoserRequired ? 'Select Loser' : '(Not Applicable)'}</em>
+                                        <em>{isLoserRequired ? t('selectLoser')  : '(Not Applicable)'}</em>
                                     </MenuItem>
                                     {loserOptions.map(p => (
                                         <MenuItem key={p.game_player_id} value={p.game_player_id}>
@@ -251,34 +323,108 @@ const RoundEntryModal: React.FC<RoundEntryModalProps> = ({
 
                         {/* Score Select */}
                         <Grid item xs={12} sm={8} {...({} as any)}>
-                            <FormControl fullWidth required margin="dense" disabled={isLoading}>
-                                <InputLabel id="score-label">Score (Faan)</InputLabel>
-                                <Select
-                                    labelId="score-label"
-                                    value={scoreValue}
-                                    label="Score (Faan)"
-                                    onChange={handleScoreChange}
-                                    sx={{
-                                        '& .MuiSelect-select': {
-                                            paddingRight: '32px !important',
-                                            minWidth: '150px',
-                                        },
-                                    }}
-                                >
-                                    {scoreOptions.length > 0 ? scoreOptions.map(score => (
-                                        <MenuItem key={score} value={score}>{score}</MenuItem>
-                                    )) : <MenuItem value="" disabled>No valid scores</MenuItem>}
-                                </Select>
-                            </FormControl>
+                            <Box sx={{ mt: 3, mb: 1 }}>
+                                <Typography variant="body2" color="silver" gutterBottom>
+                                    {t('scoreRefFaanHeader')}
+                                </Typography>
+                                
+                                <Box sx={{ 
+                                    display: 'flex', 
+                                    flexDirection: 'column',
+                                    alignItems: 'center',
+                                    px: 2
+                                }}>
+                                    {/* Current score display */}
+                                    <Typography variant="h4" color="white" sx={{ mb: 1 }}>
+                                        {scoreValue}
+                                    </Typography>
+
+                                    {/* Slider component */}
+                                    <Slider
+                                        value={scoreValue}
+                                        onChange={(_, value) => setScoreValue(value as number)}
+                                        step={1}
+                                        marks
+                                        min={scoreLimits.min}
+                                        max={scoreLimits.max}
+                                        valueLabelDisplay="auto"
+                                        aria-labelledby="score-slider"
+                                        sx={{
+                                            width: '100%',
+                                            color: 'white',
+                                            '& .MuiSlider-rail': {
+                                                backgroundColor: 'rgba(255, 255, 255, 0.3)',
+                                            },
+                                            '& .MuiSlider-track': {
+                                                backgroundColor: 'white',
+                                            },
+                                            '& .MuiSlider-thumb': {
+                                                backgroundColor: 'white',
+                                                '&:hover, &.Mui-focusVisible': {
+                                                    boxShadow: '0 0 0 8px rgba(255, 255, 255, 0.16)'
+                                                }
+                                            },
+                                            '& .MuiSlider-mark': {
+                                                backgroundColor: 'silver',
+                                                height: 4,
+                                            },
+                                            '& .MuiSlider-markActive': {
+                                                backgroundColor: 'white', 
+                                            }
+                                        }}
+                                    />
+                                    
+                                    {/* Score range indicator */}
+                                    <Box sx={{ 
+                                        display: 'flex', 
+                                        justifyContent: 'space-between', 
+                                        width: '100%', 
+                                        mt: 1 
+                                    }}>
+                                        {/* <Typography variant="caption" color="silver">{t('minScoreLabel')}: {scoreLimits.min}</Typography>
+                                        <Typography variant="caption" color="silver">{t('maxScoreLabel')}: {scoreLimits.max}</Typography> */}
+                                    </Box>
+                                </Box>
+                            </Box>
                         </Grid>
-                         {error && <Grid item xs={12} {...({} as any)}><Alert severity="error" variant="outlined" sx={{mt: 1}}>{error}</Alert></Grid>}
+                        {error && <Grid item xs={12} {...({} as any)}><Alert severity="error" variant="outlined" sx={{mt: 1}}>{error}</Alert></Grid>}
                     </Grid>
                 </Box>
             </DialogContent>
             <DialogActions sx={{ p: '16px 24px' }}>
-                <Button onClick={onClose} disabled={isLoading}>Cancel</Button>
-                <Button onClick={handleSubmit} variant="contained" disabled={isLoading}>
-                    {isLoading ? 'Submitting...' : 'Submit Round'}
+            <Button 
+                    onClick={onClose} 
+                    disabled={isLoading}
+                    sx={{ 
+                        color: 'silver', 
+                        '&:hover': { 
+                            color: 'white', 
+                            backgroundColor: 'rgba(255, 255, 255, 0.08)' 
+                        },
+                        '&.Mui-disabled': {
+                            color: 'rgba(192, 192, 192, 0.3)'
+                        }
+                    }}
+                >
+                    {t('cancel')}
+                </Button>
+                <Button 
+                    onClick={handleSubmit} 
+                    variant="contained" 
+                    disabled={isLoading}
+                    sx={{
+                        backgroundColor: 'white',
+                        color: 'black',
+                        '&:hover': {
+                            backgroundColor: '#e0e0e0'
+                        },
+                        '&.Mui-disabled': {
+                            backgroundColor: 'rgba(255, 255, 255, 0.3)',
+                            color: 'rgba(0, 0, 0, 0.6)'
+                        }
+                    }}
+                >
+                    {isLoading ? t('submitting') : t('sumbitRound')}
                 </Button>
             </DialogActions>
         </Dialog>

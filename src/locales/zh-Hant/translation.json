@@ -8,7 +8,7 @@
     "playerLabel": "玩家 {{index}}",
     "playerNameHint": "玩家名稱",
     "playerColorLabel": "代表顏色",
-    "playerInitialOffsetLabel": "初始分數",
+    "playerInitialOffsetLabel": "初始餘額 ($)",
 
     "gameStatusLabel": "狀態",
     "gameRulesLabel": "規則",
@@ -22,19 +22,90 @@
     "moneyLabel": "${{money}}",
     "halfAfter5Rule": "半辣上",
     "hotHotUpRule": "辣辣上",
+    "paymentRuleLabel": "全統/半統",
+    "fullTungRule": "全統",
+    "halfTungRule": "半統",
+
+    "playerCountLabel": "玩家人數: {{count}}",
+
     "createGameButton": "建立牌局",
     "langEnglish": "English",
     "langChinese": "繁體中文",
     "loadingGame": "載入遊戲中...",
-    "errorLoadingGame": "載入遊戲失敗: {{error}}",
     "creatingGameButton": "建立牌局中...",
+    "newGameSetupButtonLabel": "新牌局",
+    "scoreRefButtonLabel": "番數參考表",
 
     "SuccessGameCreation": "牌局建成！ID: {{game_id}}。稍後會自動轉到牌局頁面...",
 
+    "gameDefaultTitle": "今晚打幾大",
+    "gameRuleSummary": "牌局規則: {{max}}番 ${{maxMoney}}, {{min}}番起糊, 計分方法: {{rule}}",
+
+    "activePlayersHeader": "枱邊玩家",
+    "noActivePlayers": "枱邊玩家不足。",
+    "balanceLabel": "餘額",
+    "addRoundButtonLabel": "加呢鋪賽果",
+
+    "hideScoreTableButton": "隱藏番數表",
+    "showScoreTableButton": "顯示番數表",
+
+    "scoreRefTableAriaLabel": "番數參考",
+
+    "roundHistoryHeader": "食糊紀錄",
+    "roundHistoryEmpty": "暫時未有人食頭糊。",
+
+    "deleteButtonLabel": "刪除",
+    "deleteConfirmTitle": "你確定要刪除呢鋪賽果？ 第{{roundNumber}鋪, {{score}}番, {{player}}贏咗{{money}}",
+    "deleteConfirmMessage": "呢個刪除動作無法復原。",
+
+    "cancel": "取消",
+    "deleting": "刪除中...",
+
+    "addRoundResult": "加呢鋪賽果",
+    "winnerLabel": "贏家",
+    "loserLabel": "輸家",
+    "winTypeLabel": "點食",
+    "winTypeNormal": "出統",
+    "winTypeSelfDrawAll": "自摸",
+    "winTypeSelfDrawOne": "包自摸",
+
+    "selectLoser": "輸家",
+
+    "submitting": "提交中...",
+    "sumbitRound": "增加賽果",
+
+    "gameError": "錯誤：{{error}}",
+
+    "errorLoadingGame": "載入遊戲失敗: {{error}}",
     "errorCreateGame": "錯誤：建立牌局失敗。",
     "errorOffsetSum": "錯誤：所有玩家嘅初始分數總和必須為零。",
     "errorMinGreaterMax": "錯誤：最小分數不能大過最大分數。",
     "errorPlayerNameUnique": "錯誤：玩家名稱必須獨一無二。",
     "errorPlayerNameEmpty": "錯誤：玩家名稱不能為空。",
-    "errorInvalidScoreLimit": "錯誤: 錯誤的分數限制"
+    "errorInvalidScoreLimit": "錯誤: 錯誤的分數限制",
+    
+    "errorNoGameId": "錯誤：網址中未提供牌局ID。",
+    "errorCannotStartNoId": "錯誤：無法啟動牌局，因為沒有有效的牌局ID。",
+    "errorDeleteFailed": "錯誤：刪除回合失敗。",
+    "errorGameNotFound": "錯誤：找不到牌局。",
+
+    "errorWinnerRequired": "錯誤：贏家是必需的。",
+    "errorLoserRequired": "錯誤：輸家是必需的。",
+    "errorScoreRange": "錯誤：分數必須在最小和最大範圍內。",
+
+    "errorGameMasterToken": "錯誤：無法獲取Game Master Token。",
+    "errorSubmitFailed": "錯誤：增加回合失敗。",
+
+    "errorNoValidScores": "錯誤：無效的番數。",
+    
+    "warningRefreshFailed": "警告：無法自動刷新頁面。請手動刷新頁面。",
+
+    "backButtonLabel": "返回",
+    "scoreRefTitle": "番數參考表",
+    "scoreRefDescription": "選擇牌局規則以查看對應的金額每番數值。",
+    "scoreRefTableHeader": "番數參考表",
+    "scoreRefFaanHeader": "番",
+    "scoreRefMoneyHeader": "$",
+    "scoreRefNoData": "無可用的分數數據，請選擇其他設置。"
+
   }

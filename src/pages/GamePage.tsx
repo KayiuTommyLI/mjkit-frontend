@@ -1,35 +1,25 @@
 // src/pages/GamePage.tsx
 import React, { useEffect, useState, useCallback } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
+import { useTranslation } from 'react-i18next'; // Import useTranslation
 
-// MUI Imports (ensure all needed are imported)
-import Container from '@mui/material/Container';
-import Typography from '@mui/material/Typography';
-import Paper from '@mui/material/Paper';
-import Box from '@mui/material/Box';
-import List from '@mui/material/List';
-import ListItem from '@mui/material/ListItem';
-import ListItemText from '@mui/material/ListItemText';
-import ListItemAvatar from '@mui/material/ListItemAvatar';
-import Avatar from '@mui/material/Avatar';
-import CircularProgress from '@mui/material/CircularProgress';
-import Alert from '@mui/material/Alert';
-import Button from '@mui/material/Button';
-import Divider from '@mui/material/Divider';
-import IconButton from '@mui/material/IconButton';
+// MUI Imports
+import {
+    Container, Typography, Paper, Box, List, ListItem, ListItemText, ListItemAvatar,
+    Avatar, CircularProgress, Alert, Button, Divider, IconButton, Collapse,
+    Table, TableBody, TableCell, TableContainer, TableHead, TableRow
+} from '@mui/material'; // Consolidated imports
 import ArrowBackIcon from '@mui/icons-material/ArrowBack';
 import PlayCircleOutlineIcon from '@mui/icons-material/PlayCircleOutline';
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 import ExpandLessIcon from '@mui/icons-material/ExpandLess';
-import DeleteIcon from '@mui/icons-material/Delete'; // For delete button in table
+import DeleteIcon from '@mui/icons-material/Delete';
 
 import ConfirmationDialog from '../components/ConfirmationDialog'; // Import confirmation dialog
-
-// Import the modal and the new table component
 import RoundEntryModal from '../components/RoundEntryModal';
 import GameHistoryTable from '../components/GameHistoryTable'; // <-- Import table component
-import { Collapse, Table, TableBody, TableCell, TableContainer, TableHead, TableRow } from '@mui/material';
 import { API_URL } from '../config';
+import { inputStyles } from '../styles/formStyles';
 
 // --- Interfaces ---
 // (Keep existing GamePlayerData and GameData interfaces)
@@ -79,35 +69,84 @@ export interface RoundData {
     roundStates: RoundStateData[];
 }
 // Keep PlayerInfoForModal and ScoreLimitsForModal
-export interface PlayerInfoForModal { game_player_id: string; player_name_in_game: string; }
-export interface ScoreLimitsForModal { min: number; max: number; }
+export interface PlayerInfoForModal { 
+    game_player_id: string; 
+    player_name_in_game: string; 
+}
+export interface ScoreLimitsForModal { 
+    min: number; 
+    max: number; 
+}
 
 interface ScorePreviewItem {
     score: number;
     money: number;
 }
 
+
+// // Reusable input styles (If needed for any inputs on this page, or import from shared)
+// const inputStyles = { 
+//     '& label.Mui-focused': { color: 'white' },
+//     '& .MuiInputLabel-root': { color: 'silver' }, // Label color
+//     '& .MuiOutlinedInput-root': {
+//         '& fieldset': { borderColor: 'silver' }, // Border color
+//         '&:hover fieldset': { borderColor: 'white' },
+//         '&.Mui-focused fieldset': { borderColor: 'white' },
+//         '& input': { color: 'white' }, // Input text color (for TextField)
+//         '& .MuiSelect-select': { color: 'white' }, // Select value color
+//         '& .MuiSvgIcon-root': { color: 'silver'} // Select dropdown arrow color
+//     },
+//      '& .MuiInputAdornment-root p': { color: 'silver' } // Adornment color (for offset) 
+// };
+
+const outlinedSilverButtonSx = { 
+    color: 'silver', 
+    borderColor: 'silver', 
+    '&:hover': { 
+        color: 'white', 
+        borderColor: 'white', 
+        backgroundColor: 'rgba(255, 255, 255, 0.08)' 
+    } 
+};
+
+const textSilverButtonSx = { 
+    color: 'silver', 
+    '&:hover': { 
+        color: 'white', 
+        backgroundColor: 'rgba(255, 255, 255, 0.08)' 
+    } 
+};
+
+const containedWhiteButtonSx = { 
+    backgroundColor: 'white', 
+    color: 'black', 
+    '&:hover': { 
+        backgroundColor: '#e0e0e0' 
+    } 
+};
+
+
 const GamePage: React.FC = () => {
     const { gameId } = useParams<{ gameId: string }>();
     const navigate = useNavigate();
+    const { t } = useTranslation(); // Initialize translation
 
     // State for game details
     const [gameData, setGameData] = useState<GameData | null>(null);
     const [loadingGame, setLoadingGame] = useState<boolean>(true); // Separate loading for game
     const [gameError, setGameError] = useState<string | null>(null);
 
-    // --- NEW: State for Rounds Data ---
+    // --- State for Rounds Data ---
     const [rounds, setRounds] = useState<RoundData[]>([]);
     const [loadingRounds, setLoadingRounds] = useState<boolean>(true); // Separate loading for rounds
     const [roundsError, setRoundsError] = useState<string | null>(null);
-    // --- END NEW ---
 
-    // --- NEW: State for Score Table ---
+
+    // --- State for Score Table ---
     const [scoreTable, setScoreTable] = useState<ScorePreviewItem[]>([]);
     const [loadingScoreTable, setLoadingScoreTable] = useState<boolean>(false); // Only load when gameData is available
     const [scoreTableError, setScoreTableError] = useState<string | null>(null);
     const [showScoreTable, setShowScoreTable] = useState<boolean>(false); // State to toggle visibility
-    // --- END NEW ---
 
     // State for Start Game action
     const [startError, setStartError] = useState<string | null>(null);
@@ -119,12 +158,11 @@ const GamePage: React.FC = () => {
     // State for Master Token presence
     const [hasMasterToken, setHasMasterToken] = useState<boolean>(false);
 
-    // --- NEW: State for Delete Confirmation ---
+    // --- State for Delete Confirmation ---
     const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState<boolean>(false);
     const [roundToDelete, setRoundToDelete] = useState<RoundData | null>(null);
     const [isDeletingRound, setIsDeletingRound] = useState<boolean>(false);
     const [deleteError, setDeleteError] = useState<string | null>(null);
-    // --- END NEW ---
 
     // Check for Master Token on Load/GameId Change
     useEffect(() => {
@@ -141,7 +179,7 @@ const GamePage: React.FC = () => {
     // Fetches both game details and rounds data, potentially in parallel
     const fetchAllGameData = useCallback(async (showLoadingSpinner = true) => {
         if (!gameId) {
-            setGameError('No Game ID provided in URL.');
+            setGameError(t('errorNoGameId'));
             setLoadingGame(false);
             setLoadingRounds(false);
             return;
@@ -169,14 +207,22 @@ const GamePage: React.FC = () => {
             // Process Game Response
             if (!gameRes.ok) {
                 let errorMsg = `Game Data Error: ${gameRes.status}`;
-                try { const d = await gameRes.json(); errorMsg = d.message || JSON.stringify(d); } catch (e) { errorMsg = `${gameRes.status} ${gameRes.statusText}`; }
+                try { 
+                    const d = await gameRes.json(); 
+                    errorMsg = d.message || JSON.stringify(d); 
+                }
+                catch (e) { 
+                    errorMsg = `${gameRes.status} ${gameRes.statusText}`; 
+                }
                 throw new Error(errorMsg); // Throw to be caught below
             }
             const gameResult: GameData = await gameRes.json();
             if (typeof gameResult.max_money === 'string') {
                 gameResult.max_money = parseFloat(gameResult.max_money);
             }
-            if (gameResult.gamePlayers) gameResult.gamePlayers.sort((a, b) => a.player_order - b.player_order);
+            if (gameResult.gamePlayers) 
+                gameResult.gamePlayers.sort((a, b) => a.player_order - b.player_order);
+
             setGameData(gameResult);
             console.log("Fetched and set game data:", gameResult);
             setLoadingGame(false);
@@ -184,7 +230,13 @@ const GamePage: React.FC = () => {
             // Process Rounds Response
             if (!roundsRes.ok) {
                 let errorMsg = `Rounds Data Error: ${roundsRes.status}`;
-                try { const d = await roundsRes.json(); errorMsg = d.message || JSON.stringify(d); } catch (e) { errorMsg = `${roundsRes.status} ${roundsRes.statusText}`; }
+                try { 
+                    const d = await roundsRes.json(); 
+                    errorMsg = d.message || JSON.stringify(d); 
+                } 
+                catch (e) { 
+                    errorMsg = `${roundsRes.status} ${roundsRes.statusText}`; 
+                }
                 // Set rounds error, but don't throw if game data was successful
                 setRoundsError(errorMsg);
                 setRounds([]);
@@ -212,19 +264,25 @@ const GamePage: React.FC = () => {
                     const scoreRes = await fetch(`${API_URL}/games/score-preview?${queryParams}`);
                     if (!scoreRes.ok) {
                          let errorMsg = `Score Table Error: ${scoreRes.status}`;
-                         try { const d = await scoreRes.json(); errorMsg = d.message || JSON.stringify(d); } catch (e) { errorMsg = `${scoreRes.status} ${scoreRes.statusText}`; }
+                         try { 
+                            const d = await scoreRes.json(); 
+                            errorMsg = d.message || JSON.stringify(d); 
+                        } 
+                        catch (e) { 
+                            errorMsg = `${scoreRes.status} ${scoreRes.statusText}`; 
+                        }
                          throw new Error(errorMsg);
                     }
                     const scoreResult: ScorePreviewItem[] = await scoreRes.json();
                     setScoreTable(scoreResult);
                     console.log("Fetched score table data:", scoreResult);
+                    setLoadingScoreTable(false);
                 } catch (scoreErr: any) {
                      console.error("Error fetching score table:", scoreErr);
                      setScoreTableError(scoreErr.message || 'Failed to load score table.');
                      setScoreTable([]);
-                } finally {
                      setLoadingScoreTable(false);
-                }
+                } 
             }
             // --- End Score Table Fetch ---
             
@@ -247,7 +305,7 @@ const GamePage: React.FC = () => {
             } 
             setDeleteError(null);
         }
-    }, [gameId]); // Dependency array includes gameId
+    }, [gameId, t]); // Dependency array includes gameId
 
     // Initial fetch on mount
     useEffect(() => {
@@ -257,16 +315,22 @@ const GamePage: React.FC = () => {
     // --- Keep Start Game Handler as is, but it calls fetchAllGameData ---
     const handleStartGame = useCallback(async () => {
         if (!gameId) {
-            setStartError("Cannot start game: Game ID missing.");
+            setStartError(t('errorCannotStartNoId'));
             return;
         }
-        setIsStartingGame(true); setStartError(null);
+        setIsStartingGame(true); 
+        setStartError(null);
         try {
             const response = await fetch(`${API_URL}/games/${gameId}/start`, { method: 'POST' });
             if (!response.ok) {
                 let errorMsg = `Failed to start game: ${response.status}`;
-                 try { const errorData = await response.json(); errorMsg = errorData.message || JSON.stringify(errorData); }
-                 catch (jsonError) { errorMsg = `${response.status} ${response.statusText}`; }
+                 try { 
+                    const errorData = await response.json(); 
+                    errorMsg = errorData.message || JSON.stringify(errorData); 
+                }
+                 catch (jsonError) { 
+                    errorMsg = `${response.status} ${response.statusText}`; 
+                }
                  throw new Error(errorMsg); // Throw to be caught below
             }
             const result = await response.json();
@@ -278,10 +342,13 @@ const GamePage: React.FC = () => {
             setHasMasterToken(true);
             console.log(`Game Master Token stored for game ${gameId}`);
             await fetchAllGameData(false); // Refresh ALL data
-        } catch (err: any) { /* ... error handling ... */ }
-        finally { setIsStartingGame(false); }
-    }, [gameId, fetchAllGameData]);
-
+        } catch (err: any) { 
+            setStartError(err.message || t('errorStartGame')); 
+        }
+        finally { 
+            setIsStartingGame(false); 
+        }
+    }, [gameId, fetchAllGameData, t]);
 
     // --- Update Modal Handlers ---
     const handleOpenRoundModal = () => {
@@ -298,7 +365,6 @@ const GamePage: React.FC = () => {
         }
     };
 
-
     const handleCloseRoundModal = () => setIsRoundModalOpen(false);
     // Refresh ALL data on successful submission
     const handleRoundSubmitSuccess = useCallback(() => {
@@ -306,8 +372,7 @@ const GamePage: React.FC = () => {
         fetchAllGameData(false); // Re-fetch both game and rounds data
     }, [fetchAllGameData]);
 
-
-    // --- NEW: Delete Round Handlers ---
+    // --- Delete Round Handlers ---
     const handleDeleteRoundRequest = useCallback((round: RoundData) => {
         console.log("Requesting delete for round:", round.round_number);
         setRoundToDelete(round); // Store the round details
@@ -352,8 +417,13 @@ const GamePage: React.FC = () => {
                      // Success handled in finally block by refreshing data
                 } else {
                     let errorMsg = `Error deleting round: ${response.status}`;
-                    try { const errorData = await response.json(); errorMsg = errorData.message || JSON.stringify(errorData); }
-                    catch (jsonError) { errorMsg = `${response.status} ${response.statusText}`; }
+                    try { 
+                        const errorData = await response.json(); 
+                        errorMsg = errorData.message || JSON.stringify(errorData); 
+                    }
+                    catch (jsonError) { 
+                        errorMsg = `${response.status} ${response.statusText}`; 
+                    }
                     throw new Error(errorMsg);
                 }
             }
@@ -363,32 +433,59 @@ const GamePage: React.FC = () => {
 
         } catch (err: any) {
             console.error("Failed to delete round:", err);
-            setDeleteError(err.message || 'Failed to delete round.');
+            setDeleteError(err.message || t('errorDeleteFailed'));
         } finally {
             setIsDeletingRound(false);
             setIsDeleteDialogOpen(false); // Close dialog regardless of success/fail
             setRoundToDelete(null);
         }
-    }, [gameId, roundToDelete, fetchAllGameData]); // Dependencies for the handler
+    }, [gameId, roundToDelete, fetchAllGameData, t]); // Dependencies for the handler
 
 
     // --- Render Logic ---
     // Combined initial loading state
     if (loadingGame && !gameData) {
-        return ( <Container sx={{ display: 'flex', justifyContent: 'center', mt: 5 }}><CircularProgress /></Container> );
+        return ( 
+            <Container sx={{ display: 'flex', justifyContent: 'center', mt: 5 }}>
+                <CircularProgress  sx={{ color: 'silver' }}/>
+            </Container> 
+            );
     }
     // Fatal error if game data failed to load
     if (gameError && !gameData) {
-        return ( <Container maxWidth="sm" sx={{ mt: 4 }}><Alert severity="error">Error: {gameError}</Alert><Button variant="outlined" onClick={() => navigate('/')} sx={{ mt: 2 }} startIcon={<ArrowBackIcon />}>Back to Setup</Button></Container> );
+        return ( 
+            <Container maxWidth="sm" sx={{ mt: 4 }}>
+                <Alert severity="error">
+                    {`${t('gameError')}: ${gameError}`}
+                </Alert>
+                <Button variant="outlined" 
+                        onClick={() => navigate('/')} sx={{ ...outlinedSilverButtonSx, mt: 2 }} startIcon={<ArrowBackIcon />}>
+                    {t('backButtonLabel')}
+                </Button>
+            </Container> 
+            );
     }
     // Fallback if gameData is somehow null after loading
     if (!gameData) {
-         return ( <Container maxWidth="sm" sx={{ mt: 4 }}><Alert severity="info">Game not found or failed to load.</Alert><Button variant="outlined" onClick={() => navigate('/')} sx={{ mt: 2 }} startIcon={<ArrowBackIcon />}>Back to Setup</Button></Container> );
+         return ( 
+            <Container maxWidth="sm" sx={{ mt: 4 }}>
+                <Alert severity="info">
+                    {t('errorGameNotFound')}
+                </Alert>
+                <Button variant="outlined" 
+                    onClick={() => navigate('/')} sx={{ ...outlinedSilverButtonSx, mt: 2 }} startIcon={<ArrowBackIcon />}>
+                    {t('backButtonLabel')}
+                </Button>
+            </Container> 
+        );
     }
 
     // Prepare data for display and modal
     const activePlayers = gameData.gamePlayers?.filter(p => p.is_active) || [];
-    const scoreLimits = { min: gameData.lower_limit_of_score, max: gameData.upper_limit_of_score };
+    const scoreLimits = { 
+        min: gameData.lower_limit_of_score, 
+        max: gameData.upper_limit_of_score 
+    };
     const activePlayersForModal: PlayerInfoForModal[] = activePlayers.map(p => ({
          game_player_id: p.game_player_id,
          player_name_in_game: p.player_name_in_game
@@ -397,24 +494,53 @@ const GamePage: React.FC = () => {
 
     return (
         <>
-            <Container maxWidth="lg" sx={{ mt: 4, mb: 4 }}>
-                 <Button variant="outlined" onClick={() => navigate('/')} sx={{ mb: 2 }} startIcon={<ArrowBackIcon />}>
-                     New Game Setup
-                 </Button>
-                 <Button variant="text" onClick={() => navigate('/score-reference')} sx={{ mb: 2, ml: 1 }}>
-                    Score Reference
-                </Button>
-                <Paper elevation={3} sx={{ p: { xs: 2, md: 3 } }}>
+            <Container maxWidth="lg" sx={{ mt: {xs: 2, sm: 4}, mb: 4 }}>
+                {/* Style Navigation Buttons */}
+                <Box sx={{ display: 'flex', justifyContent: 'flex-start', flexWrap: 'wrap', mb: 2, gap: 1 }}>
+                    <Button variant="outlined" onClick={() => navigate('/')} sx={outlinedSilverButtonSx} startIcon={<ArrowBackIcon />}>
+                        {t('newGameSetupButtonLabel')}
+                    </Button>
+                    <Button variant="text" onClick={() => navigate('/score-reference')}  sx={outlinedSilverButtonSx}>
+                        {t('scoreRefButtonLabel')} 
+                    </Button>
+                </Box>
+                <Paper elevation={0} sx={{ p: { xs: 2, md: 3 }, backgroundColor: 'transparent', color: 'white' }}>
                     {/* Display non-fatal fetch error if occurred during refresh */}
-                     {gameError && !loadingGame && <Alert severity="warning" sx={{ mb: 2 }}>Could not refresh game data: {gameError}</Alert>}
+                     {gameError && !loadingGame && 
+                        <Alert severity="warning" sx={{ mb: 2 }}>
+                            {t('warningRefreshFailed', { error: gameError })}
+                        </Alert>
+                    }
                      {/* Display start game error */}
-                     {startError && <Alert severity="error" sx={{ mb: 2 }}>{startError}</Alert>}
+                     {startError && 
+                        <Alert severity="error" sx={{ mb: 2 }}>
+                            {startError}
+                        </Alert>
+                    }
 
                      {/* Display delete error */}
-                     {deleteError && <Alert severity="error" sx={{ mb: 2 }}>{deleteError}</Alert>}
+                     {deleteError && 
+                        <Alert severity="error" sx={{ mb: 2 }}>
+                            {deleteError}
+                        </Alert>
+                    }
 
                     {/* ... Game Title, Rules display ... */}
-                     <Divider sx={{ my: 2 }} />
+                    <Typography variant="h5" sx={{ color: 'white', mb: 1 }}>
+                        {gameData.game_name || t('gameDefaultTitle')}
+                    </Typography>
+                    <Typography variant="body2" sx={{ color: 'silver', mb: 1 }}>
+                        {t('gameRuleSummary', {
+                            min: scoreLimits.min, 
+                            max: scoreLimits.max, 
+                            maxMoney: gameData.max_money, 
+                            rule: gameData.half_money_rule ? t('halfAfter5Rule') : t('hotHotUpRule')
+                            }
+                        )}
+                    </Typography>
+                    
+                    <Divider sx={{ my: 2 , borderColor: 'rgba(192, 192, 192, 0.3)' }} />
+
                      {/* ... Start Game Button (Conditional) ... */}
                      {gameData.game_status === 'setting_up' && (
                         <Box sx={{ mb: 2, display: 'flex', justifyContent: 'center' }}>
@@ -429,76 +555,87 @@ const GamePage: React.FC = () => {
                             </Button>
                         </Box>
                     )}
-                     <Typography variant="h6" component="h2" gutterBottom>Active Players</Typography>
+                    <Typography variant="h6" component="h2" gutterBottom sx={{ color: 'white' }}>
+                        {t('activePlayersHeader')}
+                    </Typography>
                      {/* ... Player List rendering ... */}
                      {/* *** This is the section that renders the list *** */}
-                     {activePlayers.length > 0 ? (
-                         <List dense={false}>
-                             {activePlayers.map((player) => (
-                                <ListItem key={player.game_player_id} divider>
-                                    <ListItemAvatar>
-                                        {/* Display color avatar */}
-                                        <Avatar sx={{ bgcolor: player.player_color_in_game, width: 32, height: 32, border: '1px solid grey' }}> </Avatar>
-                                    </ListItemAvatar>
-                                    {/* Display name and balance */}
-                                    <ListItemText
-                                        primary={player.player_name_in_game}
-                                        secondary={`Balance: $${parseFloat(player.current_balance as any).toFixed(2)}`} // ParseFloat fix
-                                    />
-                                </ListItem>
-                            ))}
-                        </List>
-                     ) : (
-                         // This message shows if activePlayers array is empty
-                         <Typography sx={{ mt: 2 }} color="text.secondary">No active players found.</Typography>
-                     )}
-                     <Divider sx={{ my: 2 }} />
-                     {/* --- Add Round Button (Conditional) --- */}
-                     <Box sx={{ mt: 3, display: 'flex', justifyContent: 'center' }}>
+                    {activePlayers.length > 0 ? (
+                        <List dense={false}>
+                            {activePlayers.map((player) => (
+                            <ListItem key={player.game_player_id} divider sx={{ borderBottomColor: 'rgba(192, 192, 192, 0.2)' }}>
+                                <ListItemAvatar>
+                                    {/* Display color avatar */}
+                                    <Avatar sx={{ bgcolor: player.player_color_in_game, width: 32, height: 32, border: '1px solid silver' }}> </Avatar>
+                                </ListItemAvatar>
+                                {/* Display name and balance */}
+                                <ListItemText
+                                    primary={player.player_name_in_game}
+                                    secondary={`${t('balanceLabel')}: $${parseFloat(player.current_balance as any).toFixed(2)}`} // ParseFloat fix
+                                    primaryTypographyProps={{ sx: { color: 'white' } }} // Style text
+                                    secondaryTypographyProps={{ sx: { color: 'silver' } }} // Style text
+                                />
+                            </ListItem>
+                        ))}
+                    </List>
+                    ) : (
+                        // This message shows if activePlayers array is empty
+                        <Typography sx={{ mt: 2 }} color="text.secondary">
+                            {t('noActivePlayers')}
+                        </Typography>
+                    )}
+
+                     <Divider sx={{ my: 2 , borderColor: 'rgba(192, 192, 192, 0.3)' }} />
+
+                     {/* --- Add Round Button --- */}
+                     <Box sx={{ mt: 3, mb: 3, display: 'flex', justifyContent: 'center' }}>
                          <Button
                              variant="contained" color="primary" size="large"
                              onClick={handleOpenRoundModal}
                              disabled={loadingGame || isStartingGame || !canAddRound} // Updated disabled logic
+                             sx={containedWhiteButtonSx}
                          >
-                             Add Round Result
+                            {t('addRoundButtonLabel')}
                          </Button>
                     </Box>
                     
-                    {/* === NEW: Collapsible Score Table Section === */}
+                    {/* === Collapsible Score Table Section === */}
                     <Box sx={{mt: 4}}>
                         <Button
                             onClick={() => setShowScoreTable(!showScoreTable)}
                             endIcon={showScoreTable ? <ExpandLessIcon /> : <ExpandMoreIcon />}
                             size="small"
-                            sx={{ textTransform: 'none', mb: 1 }}
+                            sx={{ ...textSilverButtonSx, textTransform: 'none', mb: 1 }}
                         >
-                            {showScoreTable ? 'Hide' : 'Show'} Score Table for Current Rules
+                            {showScoreTable ?  t('hideScoreTableButton') : t('showScoreTableButton')}
                         </Button>
                         <Collapse in={showScoreTable} timeout="auto" unmountOnExit>
                             {loadingScoreTable ? (
-                                <Box sx={{ display: 'flex', justifyContent: 'center', p: 2 }}><CircularProgress size={24} /></Box>
+                                <Box sx={{ display: 'flex', justifyContent: 'center', p: 2 }}>
+                                    <CircularProgress size={24} sx={{color: 'silver'}}/>
+                                </Box>
                             ) : scoreTableError ? (
                                 <Alert severity="error" sx={{ mb: 2 }}>{scoreTableError}</Alert>
                             ) : (
-                                <TableContainer component={Paper} variant="outlined" sx={{ maxWidth: 300, margin: 'auto' }}>
-                                    <Table size="small" aria-label="score reference table">
-                                        <TableHead sx={{ backgroundColor: 'action.hover' }}>
+                                <TableContainer component={Paper} variant="outlined" sx={{ backgroundColor: 'transparent', borderColor: 'rgba(192, 192, 192, 0.5)', margin: 'auto', maxWidth: 'fit-content' }}>
+                                    <Table size="small" aria-label={t('scoreRefTableAriaLabel')}>
+                                        {/* <TableHead>
                                             <TableRow>
-                                                <TableCell sx={{ fontWeight: 'bold' }}>Faan</TableCell>
-                                                <TableCell align="right" sx={{ fontWeight: 'bold' }}>Money ($)</TableCell>
+                                                <TableCell sx={{ fontWeight: 'bold', color: 'white', borderBottomColor: 'rgba(192, 192, 192, 0.5)' }}>{t('scoreLabel')}</TableCell>
+                                                <TableCell align="right" sx={{ fontWeight: 'bold', color: 'white', borderBottomColor: 'rgba(192, 192, 192, 0.5)' }}>{t('moneyLabel')}</TableCell>
                                             </TableRow>
-                                        </TableHead>
+                                        </TableHead> */}
                                         <TableBody>
                                             {scoreTable.length > 0 ? (
                                                 scoreTable.map((item) => (
                                                     <TableRow key={item.score} sx={{ '&:last-child td, &:last-child th': { border: 0 } }}>
-                                                        <TableCell>{item.score}</TableCell>
-                                                        <TableCell align="right">${item.money.toFixed(1)}</TableCell>
+                                                        <TableCell sx={{ color: 'silver', borderBottomColor: 'rgba(192, 192, 192, 0.3)' }}>{item.score} {t('Faan')}</TableCell>
+                                                        <TableCell align="right" sx={{ color: 'white', borderBottomColor: 'rgba(192, 192, 192, 0.3)' }}>${item.money.toFixed(1)}</TableCell>                                                    
                                                     </TableRow>
                                                 ))
                                             ) : (
                                                 <TableRow>
-                                                     <TableCell colSpan={2} align="center">No data.</TableCell>
+                                                     <TableCell colSpan={2} align="center">{t('scoreRefNoData')}</TableCell>
                                                 </TableRow>
                                             )}
                                         </TableBody>
@@ -511,7 +648,7 @@ const GamePage: React.FC = () => {
 
                     {/* === Render GameHistoryTable === */}
                      <Box sx={{mt: 4}}>
-                        <Typography variant="h6" component="h2" gutterBottom>Round History</Typography>
+                        <Typography variant="h6" component="h2" gutterBottom sx={{ color: 'white' }}>{t('roundHistoryHeader')}</Typography>
                         {/* Pass rounds and active players data */}
                         <GameHistoryTable
                             rounds={rounds}
@@ -544,9 +681,9 @@ const GamePage: React.FC = () => {
                 open={isDeleteDialogOpen}
                 onClose={handleCloseDeleteDialog}
                 onConfirm={handleConfirmDelete}
-                title="Confirm Delete Round"
-                message={`Are you sure you want to delete Round #${roundToDelete?.round_number}? This action cannot be undone.`}
-                confirmText="Delete"
+                title={t('deleteConfirmTitle')} 
+                message={t('deleteConfirmMessage', { roundNumber: roundToDelete?.round_number, score: roundToDelete?.score_value, player: roundToDelete?.winner })}
+                confirmText={t('deleteButtonLabel')} 
                 isConfirming={isDeletingRound} // Pass loading state for delete confirmation
             />
         </>
