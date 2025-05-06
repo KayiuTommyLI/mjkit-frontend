@@ -286,6 +286,7 @@ const ShareGameDialog: React.FC<ShareGameDialogProps> = ({ open, onClose, gameId
                                 sx={{
                                     ...outlinedSilverButtonSx, 
                                     mt: 1,
+                                    alignItems: 'center',
                                     ...(includeAdminRights && {
                                         color: 'orange',
                                         borderColor: 'orange',
@@ -299,7 +300,8 @@ const ShareGameDialog: React.FC<ShareGameDialogProps> = ({ open, onClose, gameId
                             >
                                 {includeAdminRights 
                                     ? t('openAdminLink') 
-                                    : t('openLink')}
+                                    : t('openLink')
+                                }
                             </Button>
                         </Box>
                     </Box>

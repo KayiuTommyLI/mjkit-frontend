@@ -426,7 +426,7 @@ const GameSetupPage: React.FC = () => {
                                         flexWrap: 'wrap',
                                         alignItems: 'center',
                                         gap: { xs: 1.5, sm: 2 },
-                                        mb: 2,
+                                        mb: 2,                                        
                                         width: '100%'
                                     }}
                                 >
@@ -437,7 +437,7 @@ const GameSetupPage: React.FC = () => {
                                         flexShrink: 0,
                                         display: 'flex',
                                         alignItems: 'center',
-                                        justifyContent: 'center'
+                                        justifyContent: 'center',
                                     }}>
                                         <EmojiColorPicker
                                             // label={t('playerColorLabel')}
@@ -446,7 +446,7 @@ const GameSetupPage: React.FC = () => {
                                             emoji={player.emoji}
                                             onEmojiChange={(newEmoji) => handlePlayerEmojiChange(index, newEmoji)}
                                             colors={availableColors}
-                                            noBorder={false}
+                                            noBorder={true}
                                         />
                                     </Box>
                                     

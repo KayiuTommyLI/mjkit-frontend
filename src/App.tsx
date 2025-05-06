@@ -19,7 +19,11 @@ function App() {
     }}>
       <LanguageSwitcher />
       
-      <Box sx={{ flex: '1 0 auto', pb: 3 }}>
+      <Box sx={{ 
+        flex: '1 0 auto', 
+        pb: 3,
+        mx: 'auto',  // Center the content
+      }}>
         <Routes>
           <Route path="/" element={<GameSetupPage />} />
           <Route path="/game/:gameId" element={<GamePage />} />

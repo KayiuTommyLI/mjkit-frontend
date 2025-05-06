@@ -158,13 +158,16 @@
     "or": "或者",
 
     "shareWithAdminRights": "分享管理權限",
-    "shareWithAdminRightsTooltip": "分享此連結會畀其他人睇到同管理遊戲賽果",
-    "adminRightsWarning": "注意：分享此連結會畀其他人改到玩家次序，增加或刪除紀錄。",
+    "shareWithAdminRightsTooltip": "分享呢條連結會畀其他人睇到同管理遊戲賽果",
+    "adminRightsWarning": "注意：分享呢條連結會畀其他人改到玩家次序，增加或刪除紀錄。",
     "scanQrToJoinWithAdmin": "掃描二維碼加入一齊管理牌局",
     "copyAdminLink": "複製管理連結",
     "adminLinkCopied": "管理連結已複製！小心分享比其他人。",
     "checkOutThisGameWithAdmin": "幫幫手喺呢個麻雀牌局入分",
   
+    "openAdminLink": "打開管理連結",
+    "openLink": "打開連結",
+
     "footerTitle": "今晚打幾大",
     "footerDescription": "一個免費開源既麻雀計分器，幫你輕鬆記錄麻雀賽果。",
     "feedbackInvitation": "你對呢個麻雀計分器有咩意見？",
