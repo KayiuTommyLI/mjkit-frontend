@@ -30,6 +30,9 @@ import { CSS } from '@dnd-kit/utilities';
 import { API_URL } from '../config';
 import { t } from 'i18next';
 
+// Add this import at the top of the file
+import { apiRequest } from '../utils/api';
+
 // Define GamePlayerData interface locally
 interface GamePlayerData {
   game_player_id: string;
