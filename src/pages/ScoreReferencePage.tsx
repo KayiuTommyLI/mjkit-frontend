@@ -107,7 +107,7 @@ const ScoreReferencePage: React.FC = () => {
         }).toString();
 
         try {
-            const response = await fetch(`${API_URL}/games/score-preview?${queryParams}`); // Use your backend URL
+            const response = await fetch(`${API_URL}/game/score-preview?${queryParams}`); // Use your backend URL
             if (!response.ok) {
                 let errorMsg = `HTTP error! status: ${response.status}`;
                 try { const errorData = await response.json(); errorMsg = errorData.message || JSON.stringify(errorData); }

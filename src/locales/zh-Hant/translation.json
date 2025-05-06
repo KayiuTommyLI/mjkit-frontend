@@ -13,8 +13,8 @@
     "gameStatusLabel": "狀態",
     "gameRulesLabel": "規則",
     "gameNameLabel": "牌局名稱(選填)",
-    "maxMoneyLabel": "打幾多錢",
-    "maxScoreLabel": "打幾多番",
+    "maxMoneyLabel": "最大打幾多錢",
+    "maxScoreLabel": "最大打幾多番",
     "minScoreLabel": "幾番起糊",
     "scoreTypeLabel": "計法",
     "scorePreviewTitle": "番數金額預覽",
@@ -22,9 +22,9 @@
     "moneyLabel": "${{money}}",
     "halfAfter5Rule": "半辣上",
     "hotHotUpRule": "辣辣上",
-    "paymentRuleLabel": "全統/半統",
-    "fullTungRule": "全統",
-    "halfTungRule": "半統",
+    "paymentRuleLabel": "全銃/半銃",
+    "fullTungRule": "全銃",
+    "halfTungRule": "半銃",
 
     "playerCountLabel": "玩家人數: {{count}}",
 
@@ -39,15 +39,24 @@
     "SuccessGameCreation": "牌局建成！ID: {{game_id}}。稍後會自動轉到牌局頁面...",
 
     "gameDefaultTitle": "今晚打幾大",
-    "gameRuleSummary": "牌局規則: {{max}}番 ${{maxMoney}}, {{min}}番起糊, 計分方法: {{rule}}",
+    "gameRuleSummary": "牌局規則: {{max}}番 ${{maxMoney}}, {{min}}番起糊, 計分方法: {{rule}} ({{onePayAllRule}})",
 
     "activePlayersHeader": "枱邊玩家",
+    "inactivePlayersHeader": "抖緊既玩家",
+
     "noActivePlayers": "枱邊玩家不足。",
     "balanceLabel": "餘額",
     "addRoundButtonLabel": "加呢鋪賽果",
+    "masterTokenRequired": "觀察只可以睇賽果。",
 
     "hideScoreTableButton": "隱藏番數表",
     "showScoreTableButton": "顯示番數表",
+
+    "directWin": "食人糊",
+    "directLoss": "出銃",
+    "paoLoss": "包人自摸",
+    "paoWin": "畀人包自摸",
+    "selfDraw": "自摸",
 
     "scoreRefTableAriaLabel": "番數參考",
 
@@ -55,7 +64,7 @@
     "roundHistoryEmpty": "暫時未有人食頭糊。",
 
     "deleteButtonLabel": "刪除",
-    "deleteConfirmTitle": "你確定要刪除呢鋪賽果？ 第{{roundNumber}鋪, {{score}}番, {{player}}贏咗{{money}}",
+    "deleteConfirmTitle": "你確定要刪除呢鋪賽果？ 第{{roundNumber}}鋪, {{score}}番, {{player}}贏咗 ${{money}}",
     "deleteConfirmMessage": "呢個刪除動作無法復原。",
 
     "cancel": "取消",
@@ -68,11 +77,36 @@
     "winTypeNormal": "出統",
     "winTypeSelfDrawAll": "自摸",
     "winTypeSelfDrawOne": "包自摸",
-
+    "moneyValue": "賺左",
+    "perPlayer": "枱邊玩家每人輸 ${{money}}",
     "selectLoser": "輸家",
 
     "submitting": "提交中...",
     "sumbitRound": "增加賽果",
+
+    "managePlayersLabel": "管理玩家",
+    "managePlayersTitle": "管理玩家",
+    "dragAndDropInstructions": "拖動玩家名稱嚟改變佢哋嘅順序",
+    "activeLabel": "枱邊",
+    "inactiveLabel": "抖緊",
+    "saveChangesLabel": "儲存",
+    "savingChangesLabel": "儲存中...",
+    "changesSavedSuccess": "變更已儲存",
+    "backToGameLabel": "返回牌局",
+    "activePlayerCountValid": "枱邊玩家人數必須係4個。",
+    "autoActivatedPlayerCount": "因為要多{{length}}個玩家先成局，所以拉左{{player}}埋枱玩。",
+    "autoDeactivatedPlayerCount": "因為多左{{length}}個玩家先成局，所以踢走左{{player}}唔畀玩。",
+
+    "east": "東",
+    "south": "南",
+    "west": "西",
+    "north": "北",
+
+    "details": "當局詳情",
+    "roundNumber": "#",
+    "roundInBalanceTrend": "第{{round}}鋪",
+
+    "balanceTrendHeader": "牌局走勢",
 
     "gameError": "錯誤：{{error}}",
 
@@ -92,6 +126,7 @@
     "errorWinnerRequired": "錯誤：贏家是必需的。",
     "errorLoserRequired": "錯誤：輸家是必需的。",
     "errorScoreRange": "錯誤：分數必須在最小和最大範圍內。",
+    
 
     "errorGameMasterToken": "錯誤：無法獲取Game Master Token。",
     "errorSubmitFailed": "錯誤：增加回合失敗。",
@@ -106,6 +141,34 @@
     "scoreRefTableHeader": "番數參考表",
     "scoreRefFaanHeader": "番",
     "scoreRefMoneyHeader": "$",
-    "scoreRefNoData": "無可用的分數數據，請選擇其他設置。"
+    "scoreRefNoData": "無可用的分數數據，請選擇其他設置。",
 
-  }
+    "newGameConfirmTitle": "開始新遊戲？",
+    "newGameConfirmMessage": "你將會離開目前的遊戲。任何未記錄的變更將會丟失。",
+    "newGameConfirmButton": "開始新遊戲",
+
+    "share": "分享",
+    "shareGame": "分享牌局賽事",
+    "scanQrToJoin": "掃描二維碼加入",
+    "copyLink": "複製連結",
+    "linkCopied": "連結已複製到剪貼簿！",
+    "shareViaSystem": "分享",
+    "checkOutThisGame": "睇下呢個麻雀牌局",
+    "shareGameTitle": "麻雀牌局分享",
+    "or": "或者",
+
+    "shareWithAdminRights": "分享管理權限",
+    "shareWithAdminRightsTooltip": "分享此連結會畀其他人睇到同管理遊戲賽果",
+    "adminRightsWarning": "注意：分享此連結會畀其他人改到玩家次序，增加或刪除紀錄。",
+    "scanQrToJoinWithAdmin": "掃描二維碼加入一齊管理牌局",
+    "copyAdminLink": "複製管理連結",
+    "adminLinkCopied": "管理連結已複製！小心分享比其他人。",
+    "checkOutThisGameWithAdmin": "幫幫手喺呢個麻雀牌局入分",
+  
+    "footerTitle": "今晚打幾大",
+    "footerDescription": "一個免費開源既麻雀計分器，幫你輕鬆記錄麻雀賽果。",
+    "feedbackInvitation": "你對呢個麻雀計分器有咩意見？",
+    "contactUs": "聯絡我哋",
+
+    "copyright": "MJKit. All rights reserved."
+}

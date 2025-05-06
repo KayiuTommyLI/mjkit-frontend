@@ -40,15 +40,23 @@
     "SuccessGameCreation": "Game created! ID: {{game_id}}. Redirecting soon...",
 
     "gameDefaultTitle": "Tonight Game",
-    "gameRuleSummary": "Game Rules: Max: {{max}} Faan, Min: {{min}} Faan, Max Money: ${{maxMoney}}, Scoring Rule: {{rule}}",
+    "gameRuleSummary": "Game Rules: Max: {{max}} Faan, Min: {{min}} Faan, Max Money: ${{maxMoney}}, Scoring Rule: {{rule}} ({{onePayAllRule}})",
 
     "activePlayersHeader": "Active Players",
+    "inactivePlayersHeader": "Inactive Players",
     "noActivePlayers": "No enough active players.",
     "balanceLabel": "Balance",
     "addRoundButtonLabel": "Add Round",
+    "masterTokenRequired": "Observers can only view results.",
 
     "hideScoreTableButton": "Hide Score Table",
     "showScoreTableButton": "Show Score Table",
+
+    "directWin": "Direct Win",
+    "directLoss": "Direct Loss",
+    "paoLoss": "Pao Loss",
+    "paoWin": "Pao Win",
+    "selfDraw": "Self Draw",
 
     "scoreRefTableAriaLabel": "Score Reference Table",
 
@@ -58,7 +66,7 @@
     "roundHistoryEmpty": "No rounds played yet.",
 
     "deleteButtonLabel": "Delete",
-    "deleteConfirmTitle": "Are you sure you want to delete this round? Round {{roundNumber}, {{score}} Faan, {{player}} won ${{money}}",
+    "deleteConfirmTitle": "Are you sure you want to delete this round? Round {{roundNumber}}, {{score}} Faan, {{player}} won ${{money}}",
     "deleteConfirmMessage": "This DELETE action cannot be undone.",
 
     "cancel": "Cancel",
@@ -71,11 +79,41 @@
     "winTypeNormal": "Normal Win",
     "winTypeSelfDrawAll": "Self-Draw (All)",
     "winTypeSelfDrawOne": "Self-Draw (One)",
+    "moneyValue": "Won",
+    "perPlayer": "Everyone lost ${{money}} per active player",
 
     "selectLoser": "Select Loser",
 
     "submitting": "Submitting...",
     "sumbitRound": "Submit Round Result",
+
+    "managePlayersLabel": "Manage Players",
+    "managePlayersTitle": "Manage All Players",
+    "dragAndDropInstructions": "Drag and drop players to reorder them. Toggle switches to set active/inactive status.",
+    "activeLabel": "Active",
+    "inactiveLabel": "Inactive",
+    "saveChangesLabel": "Save Changes",
+    "savingChangesLabel": "Saving...",
+    "changesSavedSuccess": "Changes saved successfully!",
+    "backToGameLabel": "Back to Game",
+    "activePlayerCountValid": "Active player count must be 4.",
+    "autoActivatedPlayerCount": "Auto-activated {{length}} player(s) to maintain required count: {{player}}",
+    "autoDeactivatedPlayerCount": "Auto-deactivated {{length}} player(s) to maintain required count: {{player}}",
+
+    "east": "East",
+    "south": "South",
+    "west": "West",
+    "north": "North",
+
+    "details": "Round Details",
+    "roundNumber": "#",
+    "roundInBalanceTrend": "Round {{round}}",
+
+    "balanceTrendHeader": "Balance Trend",
+    
+    "newGameConfirmTitle": "Start a New Game?",
+    "newGameConfirmMessage": "You will leave the current game. Any unrecorded changes will be lost.",
+    "newGameConfirmButton": "Start New Game",
 
     "gameError": "Error: {{error}}",
 
@@ -108,6 +146,30 @@
     "scoreRefTableHeader": "Score Reference Table",
     "scoreRefFaanHeader": "Faan",
     "scoreRefMoneyHeader": "$",
-    "scoreRefNoData": "No score data available for selected settings."
+    "scoreRefNoData": "No score data available for selected settings.",
+        
+    "share": "Share",
+    "shareGame": "Share Game",
+    "scanQrToJoin": "Scan this QR code to view the game",
+    "copyLink": "Copy Link",
+    "linkCopied": "Link copied to clipboard!",
+    "shareViaSystem": "Share",
+    "checkOutThisGame": "Check out this mahjong game",
+    "shareGameTitle": "Mahjong Game Share",
+    "or": "or",
 
-  }
+    "shareWithAdminRights": "Share with Admin Rights",
+    "shareWithAdminRightsTooltip": "This will allow recipients to add rounds and make changes",
+    "adminRightsWarning": "Warning: Recipients will have full control to add/delete rounds and modify players",
+    "scanQrToJoinWithAdmin": "Scan this QR code to view and administrate the game",
+    "copyAdminLink": "Copy Admin Link",
+    "adminLinkCopied": "Admin link copied! Be careful who you share this with.",
+    "checkOutThisGameWithAdmin": "Check out this mahjong game (includes admin rights)",
+  
+    "footerTitle": "Mahjong Scorekeeper (Tonight hit how large)",
+    "footerDescription": "A mahjong scoring app for tracking your games.",
+    "feedbackInvitation": "We would love to hear your thoughts!",
+    "contactUs": "Contact Us",
+
+    "copyright": "MJKit. All rights reserved."
+}

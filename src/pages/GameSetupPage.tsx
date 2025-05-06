@@ -1,4 +1,4 @@
-import { useState, useEffect, ChangeEvent, FormEvent } from 'react';
+import { useState, useEffect, ChangeEvent, FormEvent, useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
 import { v4 as uuidv4 } from 'uuid';
 import { useNavigate } from 'react-router-dom';
@@ -7,12 +7,10 @@ import { useNavigate } from 'react-router-dom';
 import Box from '@mui/material/Box';
 import Button from '@mui/material/Button';
 import TextField from '@mui/material/TextField';
-import Select, { SelectChangeEvent } from '@mui/material/Select';
-import MenuItem from '@mui/material/MenuItem';
+import { SelectChangeEvent } from '@mui/material/Select';
 import Slider from '@mui/material/Slider';
 import Radio from '@mui/material/Radio';
 import FormControl from '@mui/material/FormControl';
-import InputLabel from '@mui/material/InputLabel';
 import Typography from '@mui/material/Typography';
 import Grid from '@mui/material/Grid';
 import Paper from '@mui/material/Paper';
@@ -20,8 +18,6 @@ import Container from '@mui/material/Container';
 import Alert from '@mui/material/Alert';
 import { API_URL } from '../config';
 import { inputStyles, whiteContainedButtonSx } from '../styles/formStyles';
-// import { InputAdornment } from '@mui/material';
-// import { MuiColorInput } from 'mui-color-input';
 import React from 'react';
 import { EmojiColorPicker } from '../components/EmojiColorPicker';
 import { InputAdornment } from '@mui/material';
@@ -33,19 +29,12 @@ interface ScorePreviewItem {
     money: number;
 }
 
-interface PlayerSetup {
-    id: string;
-    name: string;
-    color: string;
-    emoji: string;  // Add this to store the player's chosen emoji
-    // ...any other fields
-  }
-
 // --- Interfaces (Match CreateGameDto structure) ---
 interface InitialPlayerDto {
     user_id: string;
     player_name_in_game: string;
     player_color_in_game: string;
+    player_emoji_in_game: string;
     player_order: number;
     initial_offset?: number;
 }
@@ -81,26 +70,9 @@ const availableColors = [
 const defaultPlayerNames = ['Player 1', 'Player 2', 'Player 3', 'Player 4'];
 const initialOffset = 0; // Default initial offset for players
 const maxMoneyOptions = [8, 16, 24, 32, 48, 64, 96, 128, 256, 512, 1024];  // 8 to 1024
-const scoreLimitOptions = Array.from({ length: 28 }, (_, i) => i + 3);  // 3 to 30
-const minScoreOptions = Array.from({ length: 8 }, (_, i) => i + 1);  // 1 to 8
 const defaultEmoji = ['👺', '👻', '👼', '🐼', '🌝', '🤠', '🤡', '🦁', '🐮', '🐷'];
 const MIN_PLAYERS = 4;
 const MAX_PLAYERS = 10;
-
-// // Style object for TextFields/Selects (to avoid repetition)
-// const inputStyles = {
-//     '& label.Mui-focused': { color: 'white' },
-//     '& .MuiInputLabel-root': { color: 'silver' }, // Label color
-//     '& .MuiOutlinedInput-root': {
-//         '& fieldset': { borderColor: 'silver' }, // Border color
-//         '&:hover fieldset': { borderColor: 'white' },
-//         '&.Mui-focused fieldset': { borderColor: 'white' },
-//         '& input': { color: 'white' }, // Input text color (for TextField)
-//         '& .MuiSelect-select': { color: 'white' }, // Select value color
-//         '& .MuiSvgIcon-root': { color: 'silver'} // Select dropdown arrow color
-//     },
-//      '& .MuiInputAdornment-root p': { color: 'silver' } // Adornment color (for offset)
-// };
 
 // --- Component ---
 const GameSetupPage: React.FC = () => {
@@ -149,7 +121,7 @@ const GameSetupPage: React.FC = () => {
             }).toString();
 
             try {
-                const response = await fetch(`${API_URL}/games/score-preview?${queryParams}`);
+                const response = await fetch(`${API_URL}/game/score-preview?${queryParams}`);
                 if (!response.ok) {
                     let errorMsg = `HTTP error! status: ${response.status}`;
                     try {
@@ -173,6 +145,24 @@ const GameSetupPage: React.FC = () => {
         fetchScorePreview();
     }, [gameSettings.max_money, gameSettings.upper_limit_of_score, gameSettings.lower_limit_of_score, 
         gameSettings.half_money_rule, gameSettings.one_pay_all_rule, i18n.language, t]);
+
+    // Add this before the return statement in your component
+    // Create logarithmically spaced positions for slider marks
+    const logPositions = useMemo(() => {
+        const minLog = Math.log(maxMoneyOptions[0]);
+        const maxLog = Math.log(maxMoneyOptions[maxMoneyOptions.length - 1]);
+        const range = maxLog - minLog;
+        
+        return maxMoneyOptions.map(value => {
+            // Calculate position as percentage (0 to 100)
+            const logVal = Math.log(value);
+            const position = ((logVal - minLog) / range) * 100;
+            return {
+                value,
+                position
+            };
+        });
+    }, []);
 
     // --- Handlers ---
     const handlePlayerNameChange = (index: number, value: string) => {
@@ -296,13 +286,14 @@ const GameSetupPage: React.FC = () => {
                 user_id: uuidv4(),
                 player_name_in_game: player.name.trim(),
                 player_color_in_game: player.color,
+                player_emoji_in_game: player.emoji,
                 player_order: index,
                 initial_offset: player.initial_offset || 0,
             })),
         };
 
         try {
-            const response = await fetch(`${API_URL}/games`, {
+            const response = await fetch(`${API_URL}/game`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify(payload),
@@ -358,7 +349,13 @@ const GameSetupPage: React.FC = () => {
                 <Grid container spacing={4}> {/* Increased spacing */}
                     {/* --- Right Column: Main Form --- */}
                     <Grid item xs={12} md={7}>
-                        <Box component="form" onSubmit={handleSubmit} noValidate sx={{ mt: 1 }}>
+                        <Box 
+                            component="form" 
+                            id="gameSetupForm"
+                            onSubmit={handleSubmit} 
+                            noValidate 
+                            sx={{ mt: 1 }}
+                        >
 
                             {/* --- Player Setup --- */}
                             <Typography variant="h6" component="h2" gutterBottom sx={{ color: 'white' }}>
@@ -508,26 +505,6 @@ const GameSetupPage: React.FC = () => {
                                 </Box>
                             ))}
 
-                            {/* Add/Remove Player Buttons
-                            <Box sx={{ display: 'flex', justifyContent: 'space-between', mb: 2 }}>
-                                <Button 
-                                    variant="contained" 
-                                    onClick={addPlayer} 
-                                    disabled={players.length >= MAX_PLAYERS}
-                                    sx={{ ...whiteContainedButtonSx }}
-                                >
-                                    {t('addPlayerButton')}
-                                </Button>
-                                <Button 
-                                    variant="contained" 
-                                    onClick={removePlayer} 
-                                    disabled={players.length <= MIN_PLAYERS}
-                                    sx={{ ...whiteContainedButtonSx }}
-                                >
-                                    {t('removePlayerButton')}
-                                </Button>
-                            </Box> */}
-
                             {/* --- Game Rules --- */}
                             <Typography variant="h6" component="h2" gutterBottom sx={{mt: 3, color: 'white' }}>
                                 {t('gameRulesLabel')}
@@ -607,7 +584,7 @@ const GameSetupPage: React.FC = () => {
                                 <Grid item xs={12}>
                                     <Box sx={{ width: '100%', mt: 1, mb: 2 }}>
                                         <Typography variant="body2" color="silver" gutterBottom>
-                                            {t('maxScoreLabel')} ({t('Faan')})
+                                            {t('maxScoreLabel')} 
                                         </Typography>
                                         
                                         <Box sx={{ 
@@ -669,7 +646,7 @@ const GameSetupPage: React.FC = () => {
                                 <Grid item xs={12}>
                                     <Box sx={{ width: '100%', mt: 1, mb: 2 }}>
                                         <Typography variant="body2" color="silver" gutterBottom>
-                                            {t('minScoreLabel')} ({t('Faan')})
+                                            {t('minScoreLabel')} 
                                         </Typography>
                                         
                                         <Box sx={{ 
@@ -811,24 +788,6 @@ const GameSetupPage: React.FC = () => {
                                     </FormControl>
                                 </Grid>
                             </Grid>
-
-                            {/* --- Error Display --- */}
-                            <Box sx={{ mt: 2, minHeight: '40px' }}>
-                                {error && <Alert severity="error" sx={{ mb: 1 }}>{error}</Alert>}
-                                {offsetError && <Alert severity="error" sx={{ mb: 1 }}>{offsetError}</Alert>}
-                                {apiSuccessMessage && <Alert severity="success">{apiSuccessMessage}</Alert>}
-                            </Box>
-
-                            {/* --- Submit Button --- */}
-                            <Button
-                                type="submit"
-                                disabled={isLoading}
-                                variant="contained"
-                                size="large"
-                                sx={{ ...whiteContainedButtonSx, mt: 2, mb: 2 }}
-                            >
-                                {isLoading ? t('creatingGameButton') : t('createGameButton')}
-                            </Button>
                         </Box>
                     </Grid>
                     {/* --- Left Column: Score Preview --- */}
@@ -847,9 +806,30 @@ const GameSetupPage: React.FC = () => {
                             lineHeight: 1.6, // Improve readability
                             fontSize: '1.2rem',
                             color: 'silver', // Set text color to silver
+                            mb: 2 // Add margin bottom for spacing
                         }}>
                             {scorePreview.length > 0 ? scorePreview.join('\n') : t('calculatingPreview')} {/* Use translation */}
                         </Paper>
+                        
+                        {/* --- Submit Button (Moved from right column) --- */}
+                        <Button
+                            type="submit"
+                            form="gameSetupForm" // Important: Connect to form by ID
+                            disabled={isLoading}
+                            variant="contained"
+                            size="large"
+                            fullWidth
+                            sx={{ ...whiteContainedButtonSx, mt: 1 }}
+                        >
+                            {isLoading ? t('creatingGameButton') : t('createGameButton')}
+                        </Button>
+                        
+                        {/* Also move error messages under the button */}
+                        <Box sx={{ mt: 2, minHeight: '40px' }}>
+                            {error && <Alert severity="error" sx={{ mb: 1 }}>{error}</Alert>}
+                            {offsetError && <Alert severity="error" sx={{ mb: 1 }}>{offsetError}</Alert>}
+                            {apiSuccessMessage && <Alert severity="success">{apiSuccessMessage}</Alert>}
+                        </Box>
                     </Grid>
                 </Grid>
             </Paper>

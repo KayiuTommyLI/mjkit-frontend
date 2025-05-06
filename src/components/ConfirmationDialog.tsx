@@ -71,7 +71,7 @@ const ConfirmationDialog: React.FC<ConfirmationDialogProps> = ({
             }
           }}
         >
-          {cancelText || t('cancel')}
+          {t('cancel')}
         </Button>
         <Button
             onClick={onConfirm}

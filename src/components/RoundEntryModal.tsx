@@ -16,10 +16,11 @@ import Alert from '@mui/material/Alert';
 import Box from '@mui/material/Box';
 import Grid from '@mui/material/Grid';
 import Typography from '@mui/material/Typography';
-import { Paper, Slider } from '@mui/material';
+import { Paper, Slider, Divider } from '@mui/material';
 import { API_URL } from '../config';
 import { useTranslation } from 'react-i18next';
 import { inputStyles } from '../styles/formStyles';
+import { apiRequest } from '../utils/api';
 
 // Define WinType enum matching your backend
 export enum WinType {
@@ -28,10 +29,13 @@ export enum WinType {
   SELF_DRAW_ONE_PAY = 'SELF_DRAW_ONE_PAY',
 }
 
-// Props expected from GamePage
+// Update the PlayerInfoForModal interface to include emoji, color and balance
 interface PlayerInfoForModal {
     game_player_id: string;
     player_name_in_game: string;
+    player_emoji_in_game?: string;
+    player_color_in_game: string;
+    current_balance?: number | string;
 }
 interface ScoreLimitsForModal {
     min: number;
@@ -46,27 +50,13 @@ interface RoundEntryModalProps {
     scoreLimits: ScoreLimitsForModal;
 }
 
-// // Common input styles - matching main application theme
-// const inputStyles = { 
-//     '& label.Mui-focused': { color: 'white' },
-//     '& .MuiInputLabel-root': { color: 'silver' }, 
-//     '& .MuiOutlinedInput-root': {
-//         '& fieldset': { borderColor: 'silver' }, 
-//         '&:hover fieldset': { borderColor: 'white' },
-//         '&.Mui-focused fieldset': { borderColor: 'white' },
-//         '& input': { color: 'white' },
-//         '& .MuiSelect-select': { color: 'white' }, 
-//         '& .MuiSvgIcon-root': { color: 'silver'} 
-//     }
-// };
-
 const RoundEntryModal: React.FC<RoundEntryModalProps> = ({
     open,
     onClose,
     onSubmitSuccess,
     gameId,
     activePlayers = [],
-    scoreLimits = { min: 1, max: 1 }
+    scoreLimits = { min: 1, max: 13 }
 }) => {
     const { t } = useTranslation();
 
@@ -131,6 +121,32 @@ const RoundEntryModal: React.FC<RoundEntryModalProps> = ({
     };
     // --- End Handlers ---
 
+    // Calculate money value based on score and win type
+    const calculateMoneyValue = (score: number, type: WinType): number => {
+        // Base calculation for money value (adjust this according to your game rules)
+        const baseValue = Math.pow(2, score);
+        
+        switch (type) {
+            case WinType.NORMAL:
+                return baseValue; // One player pays
+            case WinType.SELF_DRAW_ALL_PAY:
+                return baseValue * 3; // All three others pay
+            case WinType.SELF_DRAW_ONE_PAY:
+                return baseValue; // One player pays
+            default:
+                return baseValue;
+        }
+    };
+    
+    // Calculate per-player payment
+    const calculatePerPlayerPayment = (score: number, type: WinType): number => {
+        const baseValue = Math.pow(2, score);
+        return baseValue;
+    };
+    
+    // Get total money value
+    const moneyValue = calculateMoneyValue(scoreValue, winType);
+    const perPlayerPayment = calculatePerPlayerPayment(scoreValue, winType);
 
     // --- Derived Data for UI ---
     const loserOptions = activePlayers.filter(p => p.game_player_id !== winnerId);
@@ -165,28 +181,20 @@ const RoundEntryModal: React.FC<RoundEntryModalProps> = ({
         console.log("Using game master token: Present");
 
         try {
-            const response = await fetch(`${API_URL}/games/${gameId}/rounds`, { 
+            await apiRequest(`game/${gameId}/rounds`, gameId, {
                 method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'x-game-master-token': gameMasterToken, // Send the master token
-                },
-                body: JSON.stringify(payload),
-             });
-            if (!response.ok) {
-                let errorMsg = `Error: ${response.status}`;
-                try { const errorData = await response.json(); errorMsg = errorData.message || JSON.stringify(errorData); }
-                catch (jsonError) { errorMsg = `${response.status} ${response.statusText}`; }
-                throw new Error(errorMsg);
-             }
-            console.log('Round submitted successfully');
+                body: payload,
+                requiresAuth: true
+            });
+            
             onSubmitSuccess();
             onClose();
         } catch (err: any) { 
             console.error("Failed to submit round:", err);
             setError(err.message || t('errorSubmitFailed'));
-         }
-        finally { setIsLoading(false); }
+        } finally { 
+            setIsLoading(false); 
+        }
     };
 
 
@@ -200,7 +208,7 @@ const RoundEntryModal: React.FC<RoundEntryModalProps> = ({
         <Dialog 
             open={open} 
             onClose={onClose} 
-            maxWidth="xs" 
+            maxWidth="sm" 
             fullWidth
             PaperComponent={props => (
                 <Paper 
@@ -221,37 +229,10 @@ const RoundEntryModal: React.FC<RoundEntryModalProps> = ({
                  <Box component="form" noValidate sx={{ mt: 1 }}>
                     {/* Use Grid container for overall form layout */}
                     <Grid container spacing={2}>
-                        {/* Winner Select */}
-                        <Grid item xs={12} sm={8} {...({} as any)}>
-                            <FormControl fullWidth required margin="dense" disabled={!activePlayers.length || isLoading} sx={inputStyles}>
-                                <InputLabel id="winner-label">
-                                    {t("winnerLabel")}
-                                </InputLabel>
-                                <Select
-                                    labelId="winner-label"
-                                    value={winnerId}
-                                    label= {t("winnerLabel")}
-                                    onChange={handleWinnerChange}
-                                    sx={{
-                                        '& .MuiSelect-select': {
-                                            paddingRight: '32px !important',
-                                            minWidth: '150px',
-                                        },
-                                    }}
-                                >
-                                    {activePlayers.map(p => (
-                                        <MenuItem key={p.game_player_id} value={p.game_player_id}>
-                                            {p.player_name_in_game}
-                                        </MenuItem>
-                                    ))}
-                                </Select>
-                            </FormControl>
-                        </Grid>
-
                         {/* Win Type Radio */}
-                        <Grid item xs={12} sm={8} {...({} as any)}>
+                        <Grid item xs={12}>
                             <FormControl component="fieldset" margin="dense" disabled={isLoading}>
-                                <Typography component="legend" variant="body2" sx={{ mb: 0.5, color: 'silver'  }}>
+                                <Typography component="legend" variant="body2" sx={{ mb: 0.5, color: 'silver' }}>
                                     {t("winTypeLabel")}
                                 </Typography>
                                 <RadioGroup row name="win_type" value={winType} onChange={handleWinTypeChange}>
@@ -263,7 +244,7 @@ const RoundEntryModal: React.FC<RoundEntryModalProps> = ({
                                         }}/>} 
                                         label={<Typography sx={{ color: 'silver' }}>
                                             {t("winTypeNormal")}
-                                            </Typography>} 
+                                        </Typography>} 
                                         sx={{ mr: 0.5 }}
                                     />
                                     <FormControlLabel 
@@ -274,7 +255,7 @@ const RoundEntryModal: React.FC<RoundEntryModalProps> = ({
                                         }}/>} 
                                         label={<Typography sx={{ color: 'silver' }}>
                                             {t("winTypeSelfDrawAll")}
-                                            </Typography>} 
+                                        </Typography>} 
                                         sx={{ mr: 0.5 }}
                                     />
                                     <FormControlLabel 
@@ -291,35 +272,216 @@ const RoundEntryModal: React.FC<RoundEntryModalProps> = ({
                             </FormControl>
                         </Grid>
 
-                        {/* Loser Select */}
-                        <Grid item xs={12} sm={8} {...({} as any)}>
-                            <FormControl fullWidth required={isLoserRequired} margin="dense" disabled={!isLoserRequired || isLoading} sx={inputStyles}>
-                                <InputLabel id="loser-label">
-                                        {isLoserRequired ? t('loserLabel') : t('notApplicable')}
-                                </InputLabel>
-                                <Select
-                                    labelId="loser-label"
-                                    value={loserId ?? ''}
-                                    label={t('loserLabel')}
-                                    onChange={handleLoserChange}
-                                    sx={{
-                                        '& .MuiSelect-select': {
-                                            paddingRight: '32px !important',
-                                            minWidth: '150px',
-                                        },
-                                    }}
-                                >
-                                    <MenuItem value="" disabled>
-                                        <em>{isLoserRequired ? t('selectLoser')  : '(Not Applicable)'}</em>
-                                    </MenuItem>
-                                    {loserOptions.map(p => (
-                                        <MenuItem key={p.game_player_id} value={p.game_player_id}>
-                                            {p.player_name_in_game}
-                                        </MenuItem>
-                                    ))}
-                                </Select>
-                            </FormControl>
+                        {/* Winner Radio Group */}
+                        <Grid item xs={12}>
+                            <Typography component="legend" variant="body2" sx={{ mb: 1, color: 'silver' }}>
+                                {t("winnerLabel")}
+                            </Typography>
+                            <Box sx={{ 
+                                display: 'grid',
+                                gridTemplateColumns: 'repeat(auto-fill, minmax(150px, 1fr))',
+                                gap: 2
+                            }}>
+                                {activePlayers.map(player => (
+                                    <Box 
+                                        key={player.game_player_id}
+                                        onClick={() => {
+                                            if (!isLoading) {
+                                                setWinnerId(player.game_player_id);
+                                                if (loserId === player.game_player_id && winType !== WinType.SELF_DRAW_ALL_PAY) {
+                                                    setLoserId('');
+                                                }
+                                                setError(null);
+                                            }
+                                        }}
+                                        sx={{ 
+                                            cursor: isLoading ? 'not-allowed' : 'pointer',
+                                            border: '2px solid',
+                                            borderColor: winnerId === player.game_player_id 
+                                                ? 'white' 
+                                                : 'rgba(192, 192, 192, 0.3)',
+                                            borderRadius: '8px',
+                                            p: 1.5,
+                                            backgroundColor: winnerId === player.game_player_id 
+                                                ? 'rgba(255, 255, 255, 0.08)'
+                                                : 'rgba(0, 0, 0, 0.2)',
+                                            transition: 'all 0.2s',
+                                            '&:hover': {
+                                                backgroundColor: winnerId === player.game_player_id 
+                                                    ? 'rgba(255, 255, 255, 0.12)'
+                                                    : 'rgba(255, 255, 255, 0.04)'
+                                            },
+                                            position: 'relative',
+                                            overflow: 'hidden'
+                                        }}
+                                    >
+                                        {/* Selection indicator overlay */}
+                                        {winnerId === player.game_player_id && (
+                                            <Box sx={{ 
+                                                position: 'absolute', 
+                                                top: 0, 
+                                                right: 0,
+                                                borderWidth: '0 20px 20px 0',
+                                                borderStyle: 'solid',
+                                                borderColor: 'transparent white transparent transparent',
+                                            }}/>
+                                        )}
+                                        
+                                        {/* Player content */}
+                                        <Box sx={{ display: 'flex', alignItems: 'center', mb: 1 }}>
+                                            <Box 
+                                                sx={{ 
+                                                    width: 40, 
+                                                    height: 40,
+                                                    borderRadius: '50%',
+                                                    bgcolor: player.player_color_in_game || 'gray',
+                                                    display: 'flex',
+                                                    alignItems: 'center',
+                                                    justifyContent: 'center',
+                                                    fontSize: '1.5rem',
+                                                    mr: 1.5
+                                                }}
+                                            >
+                                                {player.player_emoji_in_game || ''}
+                                            </Box>
+                                            <Box sx={{ overflow: 'hidden' }}>
+                                                <Typography 
+                                                    variant="subtitle1" 
+                                                    sx={{ 
+                                                        color: 'white',
+                                                        fontWeight: winnerId === player.game_player_id ? 'bold' : 'normal',
+                                                        whiteSpace: 'nowrap',
+                                                        overflow: 'hidden',
+                                                        textOverflow: 'ellipsis'
+                                                    }}
+                                                >
+                                                    {player.player_name_in_game}
+                                                </Typography>
+                                                {/* Display balance if available */}
+                                                {player.current_balance !== undefined && (
+                                                    <Typography 
+                                                        variant="body2" 
+                                                        sx={{ 
+                                                            color: parseFloat(String(player.current_balance)) >= 0 
+                                                                ? '#90EE90' 
+                                                                : '#FFA07A',
+                                                            fontWeight: 'bold'
+                                                        }}
+                                                    >
+                                                        ${parseFloat(String(player.current_balance)).toFixed(2)}
+                                                    </Typography>
+                                                )}
+                                            </Box>
+                                        </Box>
+                                    </Box>
+                                ))}
+                            </Box>
                         </Grid>
+
+                        {/* Loser selection with similar player cards */}
+                        {isLoserRequired && (
+                            <Grid item xs={12}>
+                                <Typography component="legend" variant="body2" sx={{ mt: 2, mb: 1, color: 'silver' }}>
+                                    {t("loserLabel")}
+                                </Typography>
+                                <Box sx={{ 
+                                    display: 'grid',
+                                    gridTemplateColumns: 'repeat(auto-fill, minmax(150px, 1fr))',
+                                    gap: 2
+                                }}>
+                                    {loserOptions.map(player => (
+                                        <Box 
+                                            key={player.game_player_id}
+                                            onClick={() => {
+                                                if (!isLoading) {
+                                                    setLoserId(player.game_player_id);
+                                                    setError(null);
+                                                }
+                                            }}
+                                            sx={{ 
+                                                cursor: isLoading ? 'not-allowed' : 'pointer',
+                                                border: '2px solid',
+                                                borderColor: loserId === player.game_player_id 
+                                                    ? 'white' 
+                                                    : 'rgba(192, 192, 192, 0.3)',
+                                                borderRadius: '8px',
+                                                p: 1.5,
+                                                backgroundColor: loserId === player.game_player_id 
+                                                    ? 'rgba(255, 255, 255, 0.08)'
+                                                    : 'rgba(0, 0, 0, 0.2)',
+                                                transition: 'all 0.2s',
+                                                '&:hover': {
+                                                    backgroundColor: loserId === player.game_player_id 
+                                                        ? 'rgba(255, 255, 255, 0.12)'
+                                                        : 'rgba(255, 255, 255, 0.04)'
+                                                },
+                                                position: 'relative',
+                                                overflow: 'hidden'
+                                            }}
+                                        >
+                                            {/* Selection indicator overlay */}
+                                            {loserId === player.game_player_id && (
+                                                <Box sx={{ 
+                                                    position: 'absolute', 
+                                                    top: 0, 
+                                                    right: 0,
+                                                    borderWidth: '0 20px 20px 0',
+                                                    borderStyle: 'solid',
+                                                    borderColor: 'transparent white transparent transparent',
+                                                }}/>
+                                            )}
+                                            
+                                            {/* Player content */}
+                                            <Box sx={{ display: 'flex', alignItems: 'center', mb: 1 }}>
+                                                <Box 
+                                                    sx={{ 
+                                                        width: 40, 
+                                                        height: 40,
+                                                        borderRadius: '50%',
+                                                        bgcolor: player.player_color_in_game || 'gray',
+                                                        display: 'flex',
+                                                        alignItems: 'center',
+                                                        justifyContent: 'center',
+                                                        fontSize: '1.5rem',
+                                                        mr: 1.5
+                                                    }}
+                                                >
+                                                    {player.player_emoji_in_game || ''}
+                                                </Box>
+                                                <Box sx={{ overflow: 'hidden' }}>
+                                                    <Typography 
+                                                        variant="subtitle1" 
+                                                        sx={{ 
+                                                            color: 'white',
+                                                            fontWeight: loserId === player.game_player_id ? 'bold' : 'normal',
+                                                            whiteSpace: 'nowrap',
+                                                            overflow: 'hidden',
+                                                            textOverflow: 'ellipsis'
+                                                        }}
+                                                    >
+                                                        {player.player_name_in_game}
+                                                    </Typography>
+                                                    {/* Display balance if available */}
+                                                    {player.current_balance !== undefined && (
+                                                        <Typography 
+                                                            variant="body2" 
+                                                            sx={{ 
+                                                                color: parseFloat(String(player.current_balance)) >= 0 
+                                                                    ? '#90EE90' 
+                                                                    : '#FFA07A',
+                                                                fontWeight: 'bold'
+                                                            }}
+                                                        >
+                                                            ${parseFloat(String(player.current_balance)).toFixed(2)}
+                                                        </Typography>
+                                                    )}
+                                                </Box>
+                                            </Box>
+                                        </Box>
+                                    ))}
+                                </Box>
+                            </Grid>
+                        )}
 
                         {/* Score Select */}
                         <Grid item xs={12} sm={8} {...({} as any)}>
@@ -374,15 +536,28 @@ const RoundEntryModal: React.FC<RoundEntryModalProps> = ({
                                         }}
                                     />
                                     
-                                    {/* Score range indicator */}
+                                    {/* Money value display */}
                                     <Box sx={{ 
-                                        display: 'flex', 
-                                        justifyContent: 'space-between', 
-                                        width: '100%', 
-                                        mt: 1 
+                                        mt: 2,
+                                        p: 1, 
+                                        border: '1px solid rgba(255, 255, 255, 0.2)',
+                                        borderRadius: '4px',
+                                        backgroundColor: 'rgba(255, 255, 255, 0.05)',
+                                        width: '100%',
+                                        textAlign: 'center'
                                     }}>
-                                        {/* <Typography variant="caption" color="silver">{t('minScoreLabel')}: {scoreLimits.min}</Typography>
-                                        <Typography variant="caption" color="silver">{t('maxScoreLabel')}: {scoreLimits.max}</Typography> */}
+                                        <Typography variant="body1" color="silver">
+                                            {t('moneyValue')}:
+                                        </Typography>
+                                        <Typography variant="h5" color="lightgreen" sx={{ fontWeight: 'bold' }}>
+                                            ${moneyValue}
+                                        </Typography>
+                                        
+                                        {winType === WinType.SELF_DRAW_ALL_PAY && (
+                                            <Typography variant="body2" color="silver" sx={{ mt: 0.5 }}>
+                                                {t('perPlayer', { money: perPlayerPayment })}
+                                            </Typography>
+                                        )}
                                     </Box>
                                 </Box>
                             </Box>

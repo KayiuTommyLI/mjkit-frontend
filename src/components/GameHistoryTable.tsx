@@ -1,169 +1,244 @@
 // src/components/GameHistoryTable.tsx
 import React from 'react';
 import {
-    Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Paper, Typography, Box, CircularProgress, Alert, Tooltip,
-    IconButton
+    Table, TableBody, TableCell, TableContainer, TableHead, TableRow,
+    Paper, Box, IconButton, CircularProgress, Typography, Alert
 } from '@mui/material';
-// Import interfaces from GamePage or a shared types file
-import { GamePlayerData, RoundData, RoundStateData } from '../pages/GamePage';
-// Optionally import icons if adding delete buttons later
-// import IconButton from '@mui/material/IconButton';
 import DeleteIcon from '@mui/icons-material/Delete';
+import { useTranslation } from 'react-i18next'; // Import translation hook
+import { RoundData } from 'src/types';
 
 interface GameHistoryTableProps {
     rounds: RoundData[];
-    activePlayers: GamePlayerData[]; // Need full player data for headers/colors
+    activePlayers: any[];
     loading: boolean;
     error: string | null;
-    onDeleteRequest: (round: RoundData) => void; // Callback to request deletion (pass whole round)
-    isDeleting: boolean; // To disable buttons while delete is in progress
-    // Add onDeleteRound prop later: onDeleteRound?: (roundId: string) => void;
+    onDeleteRequest: (round: RoundData) => void;
+    isDeleting: boolean;
+    sx?: any;
+    gameId?: string; // Add this prop
 }
 
-// Helper function to format balance changes with color styling
-const formatBalanceChange = (change: number | string | undefined): React.ReactNode => {
-    if (change === undefined || change === null) return '-';
-    const numChange = typeof change === 'string' ? parseFloat(change) : change;
-    if (isNaN(numChange)) return '-';
-
-    const formatted = `${numChange > 0 ? '+' : ''}${numChange.toFixed(1)}`;
-    const color = numChange > 0 ? 'success.main' : (numChange < 0 ? 'error.main' : 'text.secondary');
-    const fontWeight = numChange !== 0 ? 'bold' : 'normal';
-
-    return <Typography variant="body2" component="span" sx={{ color, fontWeight }}>{formatted}</Typography>;
-};
-
-// Helper function to get player name (handles potential missing relations)
-const getPlayerName = (playerId: string | null | undefined, players: GamePlayerData[]): string => {
-    if (!playerId) return '-';
-    const player = players.find(p => p.game_player_id === playerId);
-    return player ? player.player_name_in_game : 'Unknown Player';
-};
-
-// Helper to display Win Type info
-const getWinTypeDisplay = (round: RoundData, players: GamePlayerData[]): string => {
-    const winnerName = round.winner?.player_name_in_game || getPlayerName(round.winner_game_player_id, players);
-    switch (round.win_type) {
-        case 'NORMAL':
-            const loserName = round.loser?.player_name_in_game || getPlayerName(round.loser_game_player_id, players);
-            return `${winnerName} wins off ${loserName}`;
-        case 'SELF_DRAW_ALL_PAY':
-            return `${winnerName} self-draw (All Pay)`;
-        case 'SELF_DRAW_ONE_PAY':
-             const specificLoserName = round.loser?.player_name_in_game || getPlayerName(round.loser_game_player_id, players);
-             return `${winnerName} self-draw off ${specificLoserName}`;
-        default:
-            return round.win_type; // Fallback
-    }
-};
-
-
 const GameHistoryTable: React.FC<GameHistoryTableProps> = ({
-    rounds = [],
-    activePlayers = [],
+    rounds,
+    activePlayers,
     loading,
     error,
     onDeleteRequest,
-    isDeleting
-    // onDeleteRound, // Add later
+    isDeleting,
+    sx = {},
+    gameId = '', // Add this parameter
 }) => {
+    const { t } = useTranslation(); // Add translation hook
+    
+    // Create map of player IDs to player details for quick lookup
+    const playerMap = React.useMemo(() => {
+        const map = new Map();
+        activePlayers.forEach(player => {
+            map.set(player.game_player_id, player);
+        });
+        return map;
+    }, [activePlayers]);
+
+    // Sort rounds by round number in descending order (newest first)
+    const sortedRounds = React.useMemo(() => {
+        return [...rounds].sort((a, b) => b.round_number - a.round_number);
+    }, [rounds]);
+
+    // Get all unique player IDs from all rounds
+    const allPlayerIds = React.useMemo(() => {
+        const playerIds = new Set<string>();
+        
+        // Add all active players first to ensure they're included
+        activePlayers.forEach(player => {
+            playerIds.add(player.game_player_id);
+        });
+        
+        // Then add any other players from round states
+        rounds.forEach(round => {
+            round.roundStates?.forEach(state => {
+                playerIds.add(state.game_player_id);
+            });
+        });
+        
+        return Array.from(playerIds);
+    }, [rounds, activePlayers]);
+
+    // Function to get player column value
+    const getPlayerValue = (round: RoundData, playerId: string) => {
+        const state = round.roundStates?.find(s => s.game_player_id === playerId);
+        if (!state) return null;
+        
+        const value = parseFloat(String(state.balance_change));
+        return {
+            value,
+            formattedValue: value === 0 ? '0.0' : value.toFixed(1),
+            positive: value > 0
+        };
+    };
+
+    // Common text styles for larger fonts
+    const cellTextStyle = {
+        fontSize: '1rem', // Larger base font size
+    };
+    
+    const headerTextStyle = {
+        ...cellTextStyle,
+        fontSize: '1.1rem', // Even larger header font
+        fontWeight: 'bold'
+    };
 
     if (loading) {
-        return <Box sx={{ display: 'flex', justifyContent: 'center', p: 3 }}><CircularProgress size={30} /></Box>;
+        return (
+            <Box sx={{ display: 'flex', justifyContent: 'center', p: 2 }}>
+                <CircularProgress size={32} sx={{ color: 'silver' }} />
+            </Box>
+        );
     }
 
     if (error) {
-        return <Alert severity="warning" sx={{ mt: 2 }}>Could not load rounds: {error}</Alert>;
+        return <Alert severity="error" sx={{ mb: 2, fontSize: '1rem' }}>{error}</Alert>;
     }
 
-    if (rounds.length === 0) {
-        return <Typography sx={{ mt: 2, p: 2, fontStyle: 'italic', textAlign: 'center' }} color="text.secondary">No rounds recorded yet.</Typography>;
+    if (sortedRounds.length === 0) {
+        return (
+            <Paper elevation={0} sx={{ p: 2, backgroundColor: 'rgba(0,0,0,0.2)', color: 'silver', textAlign: 'center' }}>
+                <Typography variant="body1" sx={{ fontSize: '1rem' }}>
+                    {t('noRoundsRecorded', 'No rounds recorded yet.')}
+                </Typography>
+            </Paper>
+        );
     }
 
-    // Create a map for quick lookup of round state by player ID within a round
-    const getRoundStateMap = (roundStates: RoundStateData[]): Map<string, RoundStateData> => {
-        return new Map(roundStates.map(state => [state.game_player_id, state]));
-    };
+    // Add this check for master token
+    const hasMasterToken = gameId ? !!localStorage.getItem(`gameMasterToken_${gameId}`) : false;
 
     return (
-        <TableContainer component={Paper} variant="outlined" sx={{ mt: 2 }}>
-            <Table size="small" aria-label="game history table">
-                <TableHead sx={{ backgroundColor: 'action.hover' }}>
+        <TableContainer component={Paper} sx={{ 
+            backgroundColor: 'transparent',
+            borderColor: 'rgba(192, 192, 192, 0.3)',
+            ...sx 
+        }}>
+            <Table size="medium" aria-label="round history table"> {/* Changed from small to medium */}
+                <TableHead>
                     <TableRow>
-                        <TableCell align="center" sx={{ fontWeight: 'bold', width: '5%' }}>#</TableCell>
-                        <TableCell sx={{ fontWeight: 'bold', width: '35%' }}>Details</TableCell>
-                        <TableCell align="center" sx={{ fontWeight: 'bold', width: '10%' }}>Score</TableCell>
-                        {/* Generate header cells for each active player */}
-                        {activePlayers.map(player => (
-                             <Tooltip title={player.player_name_in_game} key={player.game_player_id}>
-                                <TableCell
-                                    align="right"
-                                    sx={{
-                                        fontWeight: 'bold',
-                                        borderLeft: '1px solid rgba(224, 224, 224, 1)', // Add vertical lines
-                                        // Apply color border to header
-                                        borderBottom: `3px solid ${player.player_color_in_game}`,
-                                        whiteSpace: 'nowrap',
-                                        overflow: 'hidden',
-                                        textOverflow: 'ellipsis',
-                                        maxWidth: '100px', // Adjust max width as needed
-                                        px: 1, // Padding
+                        <TableCell sx={{ color: 'white', ...headerTextStyle, width: '40px' }}>
+                            {t('roundNumber')}
+                        </TableCell>
+                        {/* <TableCell sx={{ color: 'white', ...headerTextStyle, minWidth: '180px' }}>
+                            {t('details')}
+                        </TableCell> */}
+                        <TableCell sx={{ color: 'white', ...headerTextStyle, width: '80px', textAlign: 'center' }}>
+                            {t('Faan')}
+                        </TableCell>
+                        
+                        {/* Player columns with their colors */}
+                        {allPlayerIds.map(playerId => {
+                            const player = playerMap.get(playerId);
+                            return (
+                                <TableCell 
+                                    key={playerId}
+                                    align="center"
+                                    sx={{ 
+                                        color: 'white',
+                                        ...headerTextStyle,
+                                        width: '70px',
+                                        backgroundColor: player?.player_color_in_game || 'transparent',
+                                        opacity: 0.9,
+                                        border: '1px solid rgba(192, 192, 192, 0.3)',
+                                        fontSize: '2rem',
                                     }}
                                 >
-                                    {/* Show only first part of name if too long */}
-                                    {player.player_name_in_game.split(' ')[0]}
+                                    {player?.player_emoji_in_game || ''}
                                 </TableCell>
-                            </Tooltip>
-                        ))}
-                        {/* Add Action column later for delete */}
-                        {<TableCell align="center" sx={{ fontWeight: 'bold', width: '5%' }}>Act</TableCell>}
+                            );
+                        })}
+                        
+                        <TableCell sx={{ color: 'white', ...headerTextStyle, width: '70px', textAlign: 'center' }}>
+                            
+                        </TableCell>
                     </TableRow>
                 </TableHead>
                 <TableBody>
-                    {/* Display rounds in reverse order (most recent last) */}
-                    {rounds.slice().reverse().map((round) => {
-                        const roundStateMap = getRoundStateMap(round.roundStates || []);
-                        const winTypeDisplay = getWinTypeDisplay(round, activePlayers);
-
-                        return (
-                            <TableRow
-                                key={round.round_id}
-                                sx={{ '&:last-child td, &:last-child th': { border: 0 } }}
-                                hover
-                            >
-                                <TableCell align="center" component="th" scope="row">{round.round_number}</TableCell>
-                                <TableCell>{winTypeDisplay}</TableCell>
-                                <TableCell align="center">{round.score_value}</TableCell>
-                                {/* Generate data cells for each active player */}
-                                {activePlayers.map(player => {
-                                    const state = roundStateMap.get(player.game_player_id);
-                                    const balanceChange = state?.balance_change;
-                                    return (
-                                        <TableCell key={`${round.round_id}-${player.game_player_id}`} align="right" sx={{ borderLeft: '1px solid rgba(224, 224, 224, 1)', px: 1 }}>
-                                            {formatBalanceChange(balanceChange)}
-                                        </TableCell>
-                                    );
-                                })}
-                                {/* Add Delete button cell later */}
-                                <TableCell align="center" sx={{ px: 0, py: 0 }}>
-                                    <Tooltip title="Delete Round">
-                                        {/* Disable button while any delete is in progress */}
-                                        <span> {/* Tooltip needs a span wrapper when button is disabled */}
-                                             <IconButton
-                                                size="small"
-                                                color="error"
-                                                // Call handler with the whole round object
-                                                onClick={() => onDeleteRequest(round)}
-                                                disabled={isDeleting} // Disable while deleting
-                                            >
-                                                <DeleteIcon fontSize="inherit" /> {/* Use inherit for better sizing */}
-                                            </IconButton>
-                                        </span>
-                                    </Tooltip>
-                                </TableCell>
-                            </TableRow>
-                        );
-                    })}
+                    {sortedRounds.map((round) => (
+                        <TableRow 
+                            key={round.round_id}
+                            sx={{ 
+                                '&:nth-of-type(odd)': { backgroundColor: 'rgba(0, 0, 0, 0.1)' },
+                                '&:hover': { backgroundColor: 'rgba(255, 255, 255, 0.05)' },
+                                height: '56px', // Increased row height
+                            }}
+                        >
+                            <TableCell sx={{ color: 'silver', ...cellTextStyle }}>
+                                {round.round_number}
+                            </TableCell>
+                            {/* <TableCell sx={{ color: 'silver', ...cellTextStyle }}>
+                                {round.winner ? (
+                                    <>
+                                        {t('playerWinsScoreFans', {
+                                            player: playerMap.get(round.winner_game_player_id)?.player_name_in_game || t('player', 'Player'),
+                                            score: round.score_value,
+                                            fans: round.score_value > 1 ? t('fans', 'fans') : t('fan', 'fan')
+                                        })}
+                                        {round.loser_game_player_id && t('offPlayer', {
+                                            player: playerMap.get(round.loser_game_player_id)?.player_name_in_game || t('player', 'Player')
+                                        })}
+                                        {round.win_type === 'self_draw' && t('selfDraw', ' (self-draw)')}
+                                        {round.win_type === 'pao' && t('pao', ' (pao)')}
+                                    </>
+                                ) : t('noWinnerDetails', 'No winner details')}
+                            </TableCell> */}
+                            <TableCell align="center" sx={{ color: 'white', fontWeight: 'bold', ...cellTextStyle }}>
+                                {round.score_value}
+                            </TableCell>
+                            
+                            {/* Player balance changes with colored values */}
+                            {allPlayerIds.map(playerId => {
+                                const playerValue = getPlayerValue(round, playerId);
+                                return (
+                                    <TableCell 
+                                        key={playerId} 
+                                        align="center"
+                                        sx={{ 
+                                            ...cellTextStyle,
+                                            color: playerValue?.value === 0 
+                                                ? 'silver !important' 
+                                                : playerValue?.positive 
+                                                    ? '#90EE90 !important' // Green for positive
+                                                    : '#FFA07A !important', // Red for negative 
+                                            fontWeight: 'bold',
+                                            fontSize: '1.1rem', // Make balance changes slightly larger
+                                            '&&': { // Double ampersand increases specificity
+                                                color: playerValue?.value === 0 
+                                                    ? 'silver' 
+                                                    : playerValue?.positive 
+                                                        ? '#90EE90' 
+                                                        : '#FFA07A',
+                                            }
+                                        }}
+                                    >
+                                        {playerValue !== null ? 
+                                            (playerValue.value > 0 ? `+${playerValue.formattedValue}` : playerValue.formattedValue) 
+                                            : '0.0'}
+                                    </TableCell>
+                                );
+                            })}
+                            
+                            {/* Delete action button */}
+                            <TableCell sx={{ width: '60px', textAlign: 'center', ...cellTextStyle }}>
+                                {hasMasterToken && (
+                                    <IconButton
+                                        onClick={() => onDeleteRequest(round)}
+                                        disabled={isDeleting}
+                                        sx={{ color: 'rgba(220, 53, 69, 0.7)', '&:hover': { color: '#dc3545' } }}
+                                        title={t('deleteRound', 'Delete round')}
+                                    >
+                                        <DeleteIcon fontSize="medium" />
+                                    </IconButton>
+                                )}
+                            </TableCell>
+                        </TableRow>
+                    ))}
                 </TableBody>
             </Table>
         </TableContainer>
