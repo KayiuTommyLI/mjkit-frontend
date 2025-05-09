@@ -43,7 +43,10 @@ export async function apiRequest(
   const requestOptions: RequestInit = {
     method,
     headers,
-    body: body ? JSON.stringify(body) : undefined
+    body: body ? JSON.stringify(body) : undefined,
+    // Add these CORS-related settings
+    mode: 'cors',
+    credentials: 'include'  // Include cookies & auth headers in the request
   };
 
   // Make request
@@ -52,12 +55,17 @@ export async function apiRequest(
   // Handle non-OK responses
   if (!response.ok) {
     let errorMessage = `Error ${response.status}: ${response.statusText}`;
+    
     try {
       const errorData = await response.json();
       errorMessage = errorData.message || JSON.stringify(errorData);
     } catch (e) {
-      // If we can't parse JSON, use the default error message
+      // If we can't parse JSON, check if this might be a CORS issue
+      if (response.status === 0 || !response.status) {
+        errorMessage = 'Network error: Possible CORS issue. Check that the API server allows cross-origin requests from this domain.';
+      }
     }
+    
     throw new Error(errorMessage);
   }
 
