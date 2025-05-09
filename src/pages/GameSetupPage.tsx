@@ -95,7 +95,7 @@ const GameSetupPage: React.FC = () => {
         upper_limit_of_score: defaultUpperLimit,
         lower_limit_of_score: defaultLowerLimit,
         half_money_rule: defaultHalfMoneyRule,
-        one_pay_all_rule: false,
+        one_pay_all_rule: true,
         game_name: '',
     });
 
@@ -281,6 +281,7 @@ const GameSetupPage: React.FC = () => {
             upper_limit_of_score: gameSettings.upper_limit_of_score,
             lower_limit_of_score: gameSettings.lower_limit_of_score,
             half_money_rule: gameSettings.half_money_rule,
+            one_pay_all_rule: gameSettings.one_pay_all_rule,
             game_name: gameSettings.game_name || undefined,
             initial_players: players.map((player, index) => ({
                 user_id: uuidv4(),
@@ -759,8 +760,8 @@ const GameSetupPage: React.FC = () => {
                                         <Box sx={{ display: 'flex', gap: 4 }}>
                                             <Box sx={{ display: 'flex', alignItems: 'center' }}>
                                                 <Radio
-                                                    checked={!gameSettings.one_pay_all_rule}
-                                                    onChange={() => setGameSettings(prev => ({ ...prev, one_pay_all_rule: false }))}
+                                                    checked={gameSettings.one_pay_all_rule}
+                                                    onChange={() => setGameSettings(prev => ({ ...prev, one_pay_all_rule: true }))}
                                                     value="true"
                                                     name="one_pay_all_rule"
                                                     sx={{
@@ -773,8 +774,8 @@ const GameSetupPage: React.FC = () => {
                                             
                                             <Box sx={{ display: 'flex', alignItems: 'center' }}>
                                                 <Radio
-                                                    checked={gameSettings.one_pay_all_rule}
-                                                    onChange={() => setGameSettings(prev => ({ ...prev, one_pay_all_rule: true }))}
+                                                    checked={!gameSettings.one_pay_all_rule}
+                                                    onChange={() => setGameSettings(prev => ({ ...prev, one_pay_all_rule: false }))}
                                                     value="false"
                                                     name="one_pay_all_rule"
                                                     sx={{

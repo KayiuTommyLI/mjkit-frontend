@@ -1,7 +1,7 @@
 import React, { useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
-import { Container, Paper, Divider, Alert, Box, CircularProgress } from '@mui/material';
+import { Container, Paper, Divider, Alert, Box, CircularProgress, Typography } from '@mui/material';
 
 // Custom Hooks
 import { useGameData } from './hooks/useGameData';
@@ -161,14 +161,29 @@ const GamePage: React.FC = () => {
     
     return (
         <>
-            <Container maxWidth="lg" sx={{ mt: { xs: 2, sm: 4 }, mb: 4 }}>
+            <Container 
+                maxWidth="lg" 
+                sx={{ 
+                    mt: { xs: 1, sm: 2, md: 4 },
+                    mb: 4,
+                    px: { xs: 1, sm: 2 } // Reduce horizontal padding on mobile
+                }}
+            >
                 <NavigationHeader 
                     gameId={gameId || ''} 
                     navigate={navigate} 
                     onNewGameClick={handleNewGameRequest}
                 />
                 
-                <Paper elevation={0} sx={{ p: { xs: 2, md: 3 }, backgroundColor: 'transparent', color: 'white' }}>
+                <Paper 
+                    elevation={0} 
+                    sx={{ 
+                        p: { xs: 1.5, sm: 2, md: 3 }, 
+                        backgroundColor: 'transparent', 
+                        color: 'white',
+                        overflow: 'hidden' // Prevent content overflow
+                    }}
+                >
                     {/* Error alerts */}
                     {gameError && !loadingGame && (
                         <Alert severity="warning" sx={{ mb: 2 }}>
@@ -193,11 +208,11 @@ const GamePage: React.FC = () => {
                     )}
                     
                     {/* Player section */}
-                    <Box sx={{ mt: 4 }}>
+                    <Box sx={{ mt: 3 }}>
                         <Box sx={{ 
                             display: 'flex', 
                             flexDirection: { xs: 'column', sm: 'row' },
-                            gap: 2
+                            gap: { xs: 1, sm: 2 }
                         }}>
                             <ActivePlayerList 
                                 activePlayers={activePlayers}
@@ -237,10 +252,18 @@ const GamePage: React.FC = () => {
                     
                     {/* Balance trend chart */}
                     <Box sx={{ mt: 4 }}>
-                        <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 2 }}>
-                            <h2 style={{ margin: 0, color: 'white' }}>
+                        <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 1 }}>
+                            <Typography 
+                                variant="h6" 
+                                component="h2" 
+                                sx={{ 
+                                    margin: 0, 
+                                    color: 'white',
+                                    fontSize: { xs: '1.1rem', sm: '1.25rem' }
+                                }}
+                            >
                                 {t('balanceTrendHeader')}
-                            </h2>
+                            </Typography>
                         </Box>
                         
                         {loadingRounds ? (
@@ -295,6 +318,7 @@ const GamePage: React.FC = () => {
                     gameId={gameId || ''}
                     activePlayers={activePlayersForModal}
                     scoreLimits={scoreLimits}
+                    scoreTable={scoreTable}
                 />
             )}
             

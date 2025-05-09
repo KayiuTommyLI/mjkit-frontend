@@ -34,6 +34,7 @@ const GameControls: React.FC<GameControlsProps> = ({
     const { t } = useTranslation();
     
     const hasMasterToken = gameId ? !!localStorage.getItem(`gameMasterToken_${gameId}`) : false;
+    const isMobile = window.innerWidth <= 600;
     
     if (type === 'start') {
         return (
@@ -57,14 +58,21 @@ const GameControls: React.FC<GameControlsProps> = ({
                 <Button
                     variant="contained"
                     color="primary" 
-                    size="large"
+                    size={isMobile ? "medium" : "large"}
                     onClick={onAction}
                     disabled={isLoading || isDisabled || !hasMasterToken}
-                    sx={containedWhiteButtonSx}
+                    sx={{
+                        ...containedWhiteButtonSx,
+                        px: { xs: 2, sm: 3 },
+                        py: { xs: 1, sm: 1.5 }
+                    }}
                 >
                     {t('addRoundButtonLabel')}
                     {!hasMasterToken && (
-                        <span style={{ fontSize: '0.7rem', marginLeft: '5px' }}>
+                        <span style={{ 
+                            fontSize: '0.65rem', 
+                            marginLeft: '5px' 
+                        }}>
                             ({t('masterTokenRequired')})
                         </span>
                     )}

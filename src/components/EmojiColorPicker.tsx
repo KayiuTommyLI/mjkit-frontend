@@ -11,6 +11,7 @@ import {
   Divider,
   Slider
 } from '@mui/material';
+import { t } from 'i18next';
 
 interface EmojiColorPickerProps {
   value: string;
@@ -25,7 +26,7 @@ interface EmojiColorPickerProps {
 // Categorized emojis for organized selection
 const emojiCategories = [
   {
-    name: "Fantasy & Magic",
+    name: t("fantasyMagic"),
     emojis: [
       '🧙', '🧙‍♀️', '🧙‍♂️', '🧚', '🧚‍♀️', '🧚‍♂️', '🧛', '🧛‍♀️', '🧛‍♂️', '🧜',
       '🧜‍♀️', '🧜‍♂️', '🧝', '🧝‍♀️', '🧝‍♂️', '🧞', '🧞‍♀️', '🧞‍♂️', '🧟', '🧟‍♀️',
@@ -34,7 +35,7 @@ const emojiCategories = [
     ]
   },
   {
-    name: "Animals",
+    name: t("animals"),
     emojis: [
       '🐶', '🐱', '🐭', '🐹', '🐰', '🦊', '🐻', '🐼', '🐨', '🐯',
       '🦁', '🐮', '🐷', '🐸', '🐵', '🙈', '🙉', '🙊', '🐔', '🐧',
@@ -44,7 +45,7 @@ const emojiCategories = [
     ]
   },
   {
-    name: "Faces & People",
+    name: t("facesPeople"),
     emojis: [
       '😀', '😁', '😂', '🤣', '😃', '😄', '😅', '😆', '😉', '😊', 
       '😋', '😎', '😍', '🥰', '😘', '😗', '😙', '😚', '🙂', '🤔',
@@ -54,7 +55,7 @@ const emojiCategories = [
     ]
   },
   {
-    name: "Game & Fun",
+    name: t("gameFun"),
     emojis: [
       '🎮', '🎲', '🎯', '🎪', '🎭', '🎨', '🎰', '🎱', '🎳', '♟️',
       '🎴', '🀄', '🎪', '🎫', '🎟️', '🧩', '🧸', '🖼️', '🎨', '🎭',
@@ -63,7 +64,7 @@ const emojiCategories = [
     ]
   },
   {
-    name: "Objects & Symbols",
+    name: t("objectsSymbols"),
     emojis: [
       '🏆', '🥇', '🥈', '🥉', '🏅', '🎖️', '🏵️', '🎗️', '🎪', '🎫',
       '💎', '💍', '💄', '👑', '👒', '🎩', '🧢', '⛑️', '📿', '💄',
@@ -72,7 +73,7 @@ const emojiCategories = [
     ]
   },
   {
-    name: "Nature & Weather",
+    name: t("natureWeather"),
     emojis: [
       '🌞', '🌝', '🌛', '🌜', '🌚', '🌕', '🌖', '🌗', '🌘', '🌑',
       '🌒', '🌓', '🌔', '🌙', '🌎', '🌍', '🌏', '💫', '⭐', '🌟',
@@ -81,7 +82,7 @@ const emojiCategories = [
     ]
   },
   {
-    name: "Food & Plants",
+    name: t("foodPlants"),
     emojis: [
       '🍏', '🍎', '🍐', '🍊', '🍋', '🍌', '🍉', '🍇', '🍓', '🍈',
       '🍒', '🍑', '🥭', '🍍', '🥥', '🥝', '🍅', '🍆', '🥑', '🥦',
@@ -315,8 +316,8 @@ export const EmojiColorPicker: React.FC<EmojiColorPickerProps> = ({
               }
             }}
           >
-            <Tab label="Colors" />
-            <Tab label="Emojis" />
+            <Tab label={t('colorsTitle')} />
+            <Tab label={t('emojiTitle')} />
           </Tabs>
 
           {/* Colors Tab Panel */}
@@ -333,7 +334,7 @@ export const EmojiColorPicker: React.FC<EmojiColorPickerProps> = ({
               <>
                 {/* Color Map Grid */}
                 <Typography variant="subtitle2" color="silver" gutterBottom>
-                  Color Map
+                  {t("colorMapTitle")}
                 </Typography>
                 <Grid container spacing={1} sx={{ mb: 2 }}>
                   {colorMap.map((color) => (
@@ -371,7 +372,7 @@ export const EmojiColorPicker: React.FC<EmojiColorPickerProps> = ({
                   <>
                     <Divider sx={{ my: 1, borderColor: 'rgba(192, 192, 192, 0.3)' }} />
                     <Typography variant="subtitle2" color="silver" gutterBottom>
-                      Preset Colors
+                      {t("presetColors")}
                     </Typography>
                     <Grid container spacing={1} sx={{ mb: 2 }}>
                       {colors.map((colorObj) => (
@@ -421,7 +422,7 @@ export const EmojiColorPicker: React.FC<EmojiColorPickerProps> = ({
                       }
                     }}
                   >
-                    <Typography variant="caption">Custom Color</Typography>
+                    <Typography variant="caption">{t("customColor")}</Typography>
                   </IconButton>
                 </Box>
               </>
@@ -430,7 +431,7 @@ export const EmojiColorPicker: React.FC<EmojiColorPickerProps> = ({
               <Box sx={{ mt: 1 }}>
                 <Box sx={{ display: 'flex', justifyContent: 'space-between', mb: 2, alignItems: 'center' }}>
                   <Typography variant="subtitle2" color="silver">
-                    Custom Color
+                  {t("customColor")}
                   </Typography>
                   <Box 
                     sx={{ 
@@ -446,7 +447,7 @@ export const EmojiColorPicker: React.FC<EmojiColorPickerProps> = ({
                 {/* RGB Sliders */}
                 <Box sx={{ mb: 2 }}>
                   <Typography variant="caption" color="silver">
-                    Red: {rgb.r}
+                    {t("red")}: {rgb.r}
                   </Typography>
                   <Slider
                     value={rgb.r}
@@ -466,7 +467,7 @@ export const EmojiColorPicker: React.FC<EmojiColorPickerProps> = ({
                 
                 <Box sx={{ mb: 2 }}>
                   <Typography variant="caption" color="silver">
-                    Green: {rgb.g}
+                  {t("green")}: {rgb.g}
                   </Typography>
                   <Slider
                     value={rgb.g}
@@ -486,7 +487,7 @@ export const EmojiColorPicker: React.FC<EmojiColorPickerProps> = ({
                 
                 <Box sx={{ mb: 2 }}>
                   <Typography variant="caption" color="silver">
-                    Blue: {rgb.b}
+                  {t("blue")}: {rgb.b}
                   </Typography>
                   <Slider
                     value={rgb.b}
@@ -518,7 +519,7 @@ export const EmojiColorPicker: React.FC<EmojiColorPickerProps> = ({
                       }
                     }}
                   >
-                    <Typography variant="caption">Back to Color Map</Typography>
+                    <Typography variant="caption">{t("backToColorMap")}</Typography>
                   </IconButton>
                 </Box>
               </Box>
@@ -535,7 +536,7 @@ export const EmojiColorPicker: React.FC<EmojiColorPickerProps> = ({
               maxHeight: 340 
             }}
           >
-            {emojiCategories.map((category, idx) => (
+            {emojiCategories.map((category, categoryIdx) => (
               <Box key={category.name} sx={{ mb: 2 }}>
                 <Typography 
                   variant="subtitle2" 
@@ -552,8 +553,8 @@ export const EmojiColorPicker: React.FC<EmojiColorPickerProps> = ({
                 </Typography>
                 
                 <Grid container spacing={1}>
-                  {category.emojis.map((emojiOption) => (
-                    <Grid item key={emojiOption}>
+                  {category.emojis.map((emojiOption, emojiIdx) => (
+                    <Grid item key={`${categoryIdx}-${emojiIdx}-${emojiOption}`}>
                       <IconButton 
                         onClick={() => handleEmojiSelect(emojiOption)}
                         sx={{
@@ -573,7 +574,7 @@ export const EmojiColorPicker: React.FC<EmojiColorPickerProps> = ({
                   ))}
                 </Grid>
                 
-                {idx < emojiCategories.length - 1 && (
+                {categoryIdx < emojiCategories.length - 1 && (
                   <Divider sx={{ mt: 1, borderColor: 'rgba(192, 192, 192, 0.1)' }} />
                 )}
               </Box>

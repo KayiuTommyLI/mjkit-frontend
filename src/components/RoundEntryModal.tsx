@@ -48,6 +48,7 @@ interface RoundEntryModalProps {
     gameId: string | undefined;
     activePlayers: PlayerInfoForModal[];
     scoreLimits: ScoreLimitsForModal;
+    scoreTable?: Array<{score: number; money: number}>;
 }
 
 const RoundEntryModal: React.FC<RoundEntryModalProps> = ({
@@ -56,7 +57,8 @@ const RoundEntryModal: React.FC<RoundEntryModalProps> = ({
     onSubmitSuccess,
     gameId,
     activePlayers = [],
-    scoreLimits = { min: 1, max: 13 }
+    scoreLimits = { min: 1, max: 13 },
+    scoreTable = []
 }) => {
     const { t } = useTranslation();
 
@@ -68,13 +70,13 @@ const RoundEntryModal: React.FC<RoundEntryModalProps> = ({
     // Component State
     const [error, setError] = useState<string | null>(null);
     const [isLoading, setIsLoading] = useState(false);
+    const [isTableLoading, setIsTableLoading] = useState(false);
 
     // Generate score options dynamically
     const scoreOptions = Array.from(
          { length: scoreLimits.max - scoreLimits.min + 1 },
          (_, i) => scoreLimits.min + i
     );
-
     // Reset form when modal opens or relevant props change
     useEffect(() => {
         if (open) {
@@ -89,6 +91,7 @@ const RoundEntryModal: React.FC<RoundEntryModalProps> = ({
             setIsLoading(false);
         }
     }, [open]); // Added scoreOptions dependency
+
 
     // --- *** CORRECTED/VERIFIED Handlers *** ---
     const handleWinTypeChange = (event: ChangeEvent<HTMLInputElement>) => {
@@ -123,30 +126,26 @@ const RoundEntryModal: React.FC<RoundEntryModalProps> = ({
 
     // Calculate money value based on score and win type
     const calculateMoneyValue = (score: number, type: WinType): number => {
-        // Base calculation for money value (adjust this according to your game rules)
-        const baseValue = Math.pow(2, score);
+        // Use the fetched score table if available
+        const matchingEntry = scoreTable.find(entry => entry.score === score);
+        const baseValue = matchingEntry ? matchingEntry.money : Math.pow(2, score); // Fallback calculation
         
         switch (type) {
             case WinType.NORMAL:
                 return baseValue; // One player pays
             case WinType.SELF_DRAW_ALL_PAY:
-                return baseValue * 3; // All three others pay
+                return baseValue / 2 * 3; // All three others pay
             case WinType.SELF_DRAW_ONE_PAY:
-                return baseValue; // One player pays
+                return baseValue / 2 * 3; // One player pays
             default:
                 return baseValue;
         }
     };
     
-    // Calculate per-player payment
-    const calculatePerPlayerPayment = (score: number, type: WinType): number => {
-        const baseValue = Math.pow(2, score);
-        return baseValue;
-    };
     
     // Get total money value
     const moneyValue = calculateMoneyValue(scoreValue, winType);
-    const perPlayerPayment = calculatePerPlayerPayment(scoreValue, winType);
+    const perPlayerPayment = moneyValue / 3;
 
     // --- Derived Data for UI ---
     const loserOptions = activePlayers.filter(p => p.game_player_id !== winnerId);
@@ -235,7 +234,8 @@ const RoundEntryModal: React.FC<RoundEntryModalProps> = ({
                                 <Typography component="legend" variant="body2" sx={{ mb: 0.5, color: 'silver' }}>
                                     {t("winTypeLabel")}
                                 </Typography>
-                                <RadioGroup row name="win_type" value={winType} onChange={handleWinTypeChange}>
+                                <RadioGroup row name="win_type" value={winType} onChange={handleWinTypeChange} 
+                                sx={{ gap: 2}}>
                                     <FormControlLabel 
                                         value={WinType.NORMAL} 
                                         control={<Radio size="small" sx={{ 

@@ -10,6 +10,25 @@
     "playerColorLabel": "Color",
     "playerInitialOffsetLabel": "Initial Offset ($)",
 
+    "colorsTitle": "Colors",
+    "emojiTitle": "Emoji",
+    "colorMapTitle": "Color Map",
+    "backToColorMap": "Back to Color Map",
+    "presetColors": "Preset Colors",
+    "customColor": "Custom Color",
+
+    "red": "Red",
+    "green": "Green",
+    "blue": "Blue",
+
+    "fantasyMagic": "Fantasy & Magic",
+    "animals": "Animals",
+    "facesPeople": "Faces & People",
+    "gameFun": "Game & Fun",
+    "objectsSymbols": "Objects & Symbols",
+    "natureWeather": "Nature & Weather",
+    "foodPlants": "Food & Plants",
+    
     "gameRulesLabel": "Game Rules",
     "gameNameLabel": "Game Name (Optional)",
 

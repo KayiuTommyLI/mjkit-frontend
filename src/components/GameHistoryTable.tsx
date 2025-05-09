@@ -114,11 +114,26 @@ const GameHistoryTable: React.FC<GameHistoryTableProps> = ({
     const hasMasterToken = gameId ? !!localStorage.getItem(`gameMasterToken_${gameId}`) : false;
 
     return (
-        <TableContainer component={Paper} sx={{ 
-            backgroundColor: 'transparent',
-            borderColor: 'rgba(192, 192, 192, 0.3)',
-            ...sx 
-        }}>
+        // Add this responsive styling to make the table work on small screens
+        <TableContainer 
+            component={Paper} 
+            sx={{
+                backgroundColor: 'transparent',
+                overflowX: 'auto', // Allow horizontal scrolling
+                '&::-webkit-scrollbar': {
+                    height: '4px'
+                },
+                '&::-webkit-scrollbar-thumb': {
+                    backgroundColor: 'rgba(255, 255, 255, 0.2)',
+                    borderRadius: '2px'
+                },
+                // Minimum width ensures columns don't compress too much
+                '& .MuiTable-root': {
+                    minWidth: '500px'
+                },
+                ...sx 
+            }}
+        >
             <Table size="medium" aria-label="round history table"> {/* Changed from small to medium */}
                 <TableHead>
                     <TableRow>
