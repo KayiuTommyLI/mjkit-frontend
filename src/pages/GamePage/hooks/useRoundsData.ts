@@ -4,7 +4,8 @@ import { API_URL } from '../../../config';
 import { RoundData, GameData } from '../../../types';
 import { apiRequest } from '../../../utils/api';
 
-export const useRoundsData = (gameId: string, gameData: GameData | null) => {
+// Update the function signature to accept fetchGameData
+export const useRoundsData = (gameId: string, gameData: GameData | null, fetchGameData: () => void) => {
     const { t } = useTranslation();
     const [rounds, setRounds] = useState<RoundData[]>([]);
     const [loadingRounds, setLoadingRounds] = useState<boolean>(true);
@@ -58,8 +59,13 @@ export const useRoundsData = (gameId: string, gameData: GameData | null) => {
     
     // Handle round submission success
     const handleRoundSubmitSuccess = useCallback(() => {
+        // Fetch the rounds data
         fetchRoundsData();
-    }, [fetchRoundsData]);
+        
+        // ALSO fetch the game data to update player balances
+        fetchGameData();
+        
+    }, [fetchRoundsData, fetchGameData]);
     
     // Handle delete round
     const handleDeleteRound = useCallback(async (roundToDelete: RoundData | null) => {

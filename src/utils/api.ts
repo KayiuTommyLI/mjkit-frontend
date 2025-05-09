@@ -24,6 +24,8 @@ export async function apiRequest(
   // Build headers
   const headers: Record<string, string> = {
     'Content-Type': 'application/json',
+    // Request CORS support
+    'Origin': window.location.origin,
     ...additionalHeaders
   };
 

@@ -47,7 +47,7 @@ const GamePage: React.FC = () => {
         handleRoundSubmitSuccess,
         isDeletingRound,
         deleteError,
-    } = useRoundsData(gameId || '', gameData);
+    } = useRoundsData(gameId || '', gameData, fetchGameData);
     
     const {
         scoreTable,
