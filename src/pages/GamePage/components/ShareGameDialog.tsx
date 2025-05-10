@@ -61,7 +61,8 @@ const ShareGameDialog: React.FC<ShareGameDialogProps> = ({ open, onClose, gameId
     // Generate URL based on whether admin rights should be included
     const generateShareUrl = () => {
         // Use hash-based URL format that works with HashRouter
-        const baseUrl = `${window.location.origin}/#/game/${gameId}`;
+        const currentPath = window.location.pathname;
+        const baseUrl = `${window.location.origin}${currentPath}#/game/${gameId}`;
         
         if (includeAdminRights && hasMasterToken) {
             const token = localStorage.getItem(`gameMasterToken_${gameId}`);

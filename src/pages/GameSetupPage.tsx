@@ -563,125 +563,41 @@ const GameSetupPage: React.FC = () => {
                                                 ${gameSettings.max_money}
                                             </Typography>
                                             
-                                            <Box sx={{ position: 'relative', width: '100%', height: 40 }}>
-                                                {/* Create the full slider track */}
-                                                <Box sx={{
-                                                    position: 'absolute',
-                                                    top: 18,
-                                                    left: 0,
-                                                    right: 0,
-                                                    height: 4,
-                                                    backgroundColor: 'rgba(255, 255, 255, 0.3)',
-                                                    borderRadius: 2
-                                                }} />
-                                                
-                                                {/* Create custom marks at logarithmic positions */}
-                                                {logPositions.map(({ value, position }) => {
-                                                    const isActive = value <= gameSettings.max_money;
-                                                    return (
-                                                        <Box
-                                                            key={value}
-                                                            sx={{
-                                                                position: 'absolute',
-                                                                left: `${position}%`,
-                                                                top: 14,
-                                                                height: 12,
-                                                                width: 2,
-                                                                transform: 'translateX(-1px)',
-                                                                backgroundColor: isActive ? 'white' : 'rgba(255, 255, 255, 0.5)',
-                                                                borderRadius: 1,
-                                                                cursor: 'pointer',
-                                                                zIndex: 2
-                                                            }}
-                                                            onClick={() => {
-                                                                setGameSettings(prev => ({
-                                                                    ...prev,
-                                                                    max_money: value
-                                                                }));
-                                                            }}
-                                                        />
-                                                    );
-                                                })}
-                                                
-                                                {/* Find active track width based on selected value position */}
-                                                {(() => {
-                                                    const activePosition = logPositions.find(pos => pos.value === gameSettings.max_money)?.position || 0;
-                                                    return (
-                                                        <Box sx={{
-                                                            position: 'absolute',
-                                                            top: 18,
-                                                            left: 0,
-                                                            height: 4,
-                                                            width: `${activePosition}%`,
-                                                            backgroundColor: 'white',
-                                                            borderRadius: 2,
-                                                            zIndex: 1
-                                                        }} />
-                                                    );
-                                                })()}
-                                                
-                                                {/* Custom thumb that follows logarithmic positions */}
-                                                {(() => {
-                                                    const activePosition = logPositions.find(pos => pos.value === gameSettings.max_money)?.position || 0;
-                                                    return (
-                                                        <Box sx={{
-                                                            position: 'absolute',
-                                                            left: `${activePosition}%`,
-                                                            top: 10,
-                                                            height: 20,
-                                                            width: 20,
-                                                            transform: 'translateX(-50%)',
-                                                            borderRadius: '50%',
-                                                            backgroundColor: 'white',
-                                                            boxShadow: '0 0 0 2px rgba(255, 255, 255, 0.1)',
-                                                            cursor: 'grab',
-                                                            zIndex: 3,
-                                                            '&:hover': {
-                                                                boxShadow: '0 0 0 8px rgba(255, 255, 255, 0.16)'
-                                                            }
-                                                        }} />
-                                                    );
-                                                })()}
-                                                
-                                                {/* Clickable areas for each value */}
-                                                {logPositions.map(({ value, position }, index) => {
-                                                    const nextPos = index < logPositions.length - 1 ? logPositions[index + 1].position : 100;
-                                                    const width = nextPos - position;
-                                                    const left = position;
-                                                    
-                                                    return (
-                                                        <Box
-                                                            key={`area-${value}`}
-                                                            sx={{
-                                                                position: 'absolute',
-                                                                left: `${left}%`,
-                                                                top: 0,
-                                                                height: '100%',
-                                                                width: `${width}%`,
-                                                                cursor: 'pointer',
-                                                                zIndex: 0
-                                                            }}
-                                                            onClick={() => {
-                                                                setGameSettings(prev => ({
-                                                                    ...prev,
-                                                                    max_money: value
-                                                                }));
-                                                            }}
-                                                        />
-                                                    );
-                                                })}
-                                            </Box>
-                                            
-                                            {/* Range indicators */}
-                                            <Box sx={{ 
-                                                display: 'flex', 
-                                                justifyContent: 'space-between', 
-                                                width: '100%', 
-                                                mt: 1.5
-                                            }}>
-                                                <Typography variant="caption" color="silver">${maxMoneyOptions[0]}</Typography>
-                                                <Typography variant="caption" color="silver">${maxMoneyOptions[maxMoneyOptions.length - 1]}</Typography>
-                                            </Box>
+                                            <Slider
+                                                value={maxMoneyOptions.indexOf(gameSettings.max_money)}
+                                                onChange={(_, value) => {
+                                                    setGameSettings(prev => ({
+                                                        ...prev,
+                                                        max_money: maxMoneyOptions[value as number]
+                                                    }));
+                                                }}
+                                                step={1}
+                                                min={0}
+                                                max={maxMoneyOptions.length - 1}
+                                                scale={(index) => maxMoneyOptions[index]}
+                                                getAriaValueText={(index) => `$${maxMoneyOptions[index]}`}
+                                                valueLabelFormat={(index) => `$${maxMoneyOptions[index]}`}
+                                                valueLabelDisplay="auto"
+                                                marks={[0, maxMoneyOptions.length - 1].map(index => ({
+                                                    value: index,
+                                                    label: `$${maxMoneyOptions[index]}`
+                                                }))}
+                                                sx={{
+                                                    width: '100%',
+                                                    color: 'white',
+                                                    '& .MuiSlider-rail': { backgroundColor: 'rgba(255, 255, 255, 0.3)' },
+                                                    '& .MuiSlider-track': { backgroundColor: 'white' },
+                                                    '& .MuiSlider-thumb': {
+                                                        backgroundColor: 'white',
+                                                        '&:hover, &.Mui-focusVisible': {
+                                                            boxShadow: '0 0 0 8px rgba(255, 255, 255, 0.16)'
+                                                        }
+                                                    },
+                                                    '& .MuiSlider-markActive': { backgroundColor: 'white' },
+                                                    '& .MuiSlider-mark': { backgroundColor: 'rgba(255, 255, 255, 0.5)' },
+                                                    '& .MuiSlider-markLabel': { color: 'silver', fontSize: '0.75rem' }
+                                                }}
+                                            />
                                         </Box>
                                     </Box>
                                 </Grid>
