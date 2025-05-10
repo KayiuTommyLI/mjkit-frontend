@@ -24,3 +24,6 @@ dist-ssr
 *.sw?
 .env.production
 src/pages/GamePage.tsx.bak
+
+
+.gitignore
