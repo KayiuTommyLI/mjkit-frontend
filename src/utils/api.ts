@@ -45,8 +45,8 @@ export async function apiRequest(
     headers,
     body: body ? JSON.stringify(body) : undefined,
     // Add these CORS-related settings
-    mode: 'cors',
-    credentials: 'include'  // Include cookies & auth headers in the request
+    mode: 'cors'
+  //  credentials: 'include'  // Include cookies & auth headers in the request
   };
 
   // Make request
