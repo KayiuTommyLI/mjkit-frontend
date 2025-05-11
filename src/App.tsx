@@ -21,8 +21,7 @@ function App() {
       
       <Box sx={{ 
         flex: '1 0 auto', 
-        pb: 3,
-        mx: 'auto',  // Center the content
+        pb: 3
       }}>
         <Routes>
           <Route path="/" element={<GameSetupPage />} />

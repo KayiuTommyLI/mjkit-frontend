@@ -577,7 +577,7 @@ const GameSetupPage: React.FC = () => {
                                                 scale={(index) => maxMoneyOptions[index]}
                                                 getAriaValueText={(index) => `$${maxMoneyOptions[index]}`}
                                                 valueLabelFormat={(index) => `$${maxMoneyOptions[index]}`}
-                                                valueLabelDisplay="auto"
+                                                valueLabelDisplay="off"
                                                 marks={[0, maxMoneyOptions.length - 1].map(index => ({
                                                     value: index,
                                                     label: `$${maxMoneyOptions[index]}`

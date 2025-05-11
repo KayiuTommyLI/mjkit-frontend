@@ -105,6 +105,9 @@
 
     "managePlayersLabel": "管理玩家",
     "managePlayersTitle": "管理玩家",
+    "addNewPlayerTitle": "加玩家",
+    "addPlayerButton": "加玩家",
+    "newPlayerDefaultInactive": "新玩家會預設抖緊",
     "dragAndDropInstructions": "拖動玩家名稱嚟改變佢哋嘅順序",
     "activeLabel": "枱邊",
     "inactiveLabel": "抖緊",
@@ -115,6 +118,9 @@
     "activePlayerCountValid": "枱邊玩家人數必須係4個。",
     "autoActivatedPlayerCount": "因為要多{{length}}個玩家先成局，所以拉左{{player}}埋枱玩。",
     "autoDeactivatedPlayerCount": "因為多左{{length}}個玩家先成局，所以踢走左{{player}}唔畀玩。",
+    "addingPlayerButton": "加玩家中...",
+    "addPlayerConfirmButton": "加玩家",
+
 
     "east": "東",
     "south": "南",
@@ -146,6 +152,10 @@
     "errorLoserRequired": "錯誤：輸家是必需的。",
     "errorScoreRange": "錯誤：分數必須在最小和最大範圍內。",
     
+    "errorMaxPlayersReachedError": "錯誤：已達到最大玩家數量。",
+    "errorPlayerNameRequiredError": "錯誤：玩家名稱是必需的。",
+    "errorFailedToAddPlayer'": "錯誤：無法添加玩家。",
+
 
     "errorGameMasterToken": "錯誤：無法獲取Game Master Token。",
     "errorSubmitFailed": "錯誤：增加回合失敗。",

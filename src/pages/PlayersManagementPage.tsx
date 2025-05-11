@@ -3,10 +3,12 @@ import { useParams, useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { 
     Container, Typography, Paper, Box, Alert, Button, 
-    Avatar, CircularProgress, Switch, FormControlLabel
+    Avatar, CircularProgress, Switch, FormControlLabel, Dialog, TextField,
+    DialogTitle, DialogContent, DialogActions
 } from '@mui/material';
 import ArrowBackIcon from '@mui/icons-material/ArrowBack';
 import DragIndicatorIcon from '@mui/icons-material/DragIndicator';
+import PersonAddIcon from '@mui/icons-material/PersonAdd';
 
 // Import DND kit instead of react-beautiful-dnd
 import {
@@ -32,6 +34,7 @@ import { t } from 'i18next';
 
 // Add this import at the top of the file
 import { apiRequest } from '../utils/api';
+import { EmojiColorPicker } from '../components/EmojiColorPicker';
 
 // Define GamePlayerData interface locally
 interface GamePlayerData {
@@ -111,7 +114,7 @@ const SortablePlayerItem = ({ player, index, toggleActive, playersArray, activeP
             alignItems: 'center',
             justifyContent: 'center',
             fontWeight: 'bold',
-            fontSize: '24px',
+            fontSize: '16px',
             whiteSpace: 'nowrap',
             color: '#fff'
         }}>
@@ -216,6 +219,13 @@ const PlayersManagementPage: React.FC = () => {
     
     // Add this state to check for master token
     const [hasMasterToken, setHasMasterToken] = useState<boolean>(false);
+    const [openAddDialog, setOpenAddDialog] = useState<boolean>(false);
+    const [newPlayerName, setNewPlayerName] = useState<string>("");
+    const [addingPlayer, setAddingPlayer] = useState<boolean>(false);
+    
+    // Add these state variables
+    const [newPlayerEmoji, setNewPlayerEmoji] = useState<string>('😀');
+    const [newPlayerColor, setNewPlayerColor] = useState<string>('#0000FF'); // Default blue
     
     // Configure sensors for drag interactions
     const sensors = useSensors(
@@ -503,6 +513,56 @@ const PlayersManagementPage: React.FC = () => {
             setSaving(false);
         }
     };
+
+    // Handle adding a new player
+    const handleAddPlayer = async () => {
+        if (!gameId || !hasMasterToken) return;
+        
+        // Validate - limit of 10 players total
+        if (players.length >= 10) {
+            setSaveError(t('errorMaxPlayersReachedError'));
+            setOpenAddDialog(false);
+            return;
+        }
+        
+        // Validate name
+        if (!newPlayerName.trim()) {
+            setSaveError(t('errorPlayerNameRequiredError'));
+            return;
+        }
+        
+        setAddingPlayer(true);
+        setSaveError(null);
+        
+        try {
+            const response = await apiRequest(`game/${gameId}/players`, gameId, {
+                method: 'POST',
+                body: {
+                    player_name_in_game: newPlayerName.trim(),
+                    player_color_in_game: newPlayerColor,
+                    player_emoji_in_game: newPlayerEmoji,
+                    // New players are inactive by default
+                    is_active: false,
+                    // Set order to be after all existing players
+                    player_order: players.length
+                },
+                requiresAuth: true
+            });
+            
+            // Refresh the player list
+            await fetchPlayers();
+            setOpenAddDialog(false);
+            setNewPlayerName("");
+            // Reset emoji and color for next time
+            setNewPlayerEmoji('😀');
+            setNewPlayerColor('#0000FF');
+            
+        } catch (err: any) {
+            setSaveError(err.message || t('errorFailedToAddPlayer'));
+        } finally {
+            setAddingPlayer(false);
+        }
+    };
     
     if (loading) {
         return (
@@ -540,15 +600,33 @@ const PlayersManagementPage: React.FC = () => {
             </Button>
             
             <Paper elevation={0} sx={{ p: 3, backgroundColor: 'transparent', color: 'white' }}>
-                <Typography variant="h5" gutterBottom sx={{ mb: 3 }}>
-                    {t('managePlayersTitle')}
-                </Typography>
-
-                {/* {!hasMasterToken && (
-                    <Alert severity="warning" sx={{ mb: 2 }}>
-                        {t('noMasterTokenWarning', 'You need the game master token to manage players. Player management is disabled.')}
-                    </Alert>
-                )} */}
+                <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 3 }}>
+                    <Typography variant="h5" gutterBottom sx={{ mb: 0 }}>
+                        {t('managePlayersTitle')}
+                    </Typography>
+                    
+                    {/* Add Player button */}
+                    <Button
+                        variant="outlined"
+                        startIcon={<PersonAddIcon />}
+                        onClick={() => setOpenAddDialog(true)}
+                        disabled={!hasMasterToken || players.length >= 10}
+                        sx={{
+                            color: 'white',
+                            borderColor: 'rgba(255, 255, 255, 0.5)',
+                            '&:hover': {
+                                borderColor: 'white',
+                                backgroundColor: 'rgba(255, 255, 255, 0.1)'
+                            },
+                            '&.Mui-disabled': {
+                                color: 'rgba(255,255,255,0.3)',
+                                borderColor: 'rgba(255,255,255,0.2)'
+                            }
+                        }}
+                    >
+                        {t('addPlayerButton')} ({players.length}/10)
+                    </Button>
+                </Box>
 
                 {saveError && <Alert severity="error" sx={{ mb: 2 }}>{saveError}</Alert>}
                 {saveSuccess && <Alert severity="success" sx={{ mb: 2 }}>{t('changesSavedSuccess')}</Alert>}
@@ -715,6 +793,132 @@ const PlayersManagementPage: React.FC = () => {
                         )}
                     </Button>
                 </Box>
+
+                {/* Add player dialog */}
+                <Dialog 
+                    open={openAddDialog} 
+                    onClose={() => !addingPlayer && setOpenAddDialog(false)}
+                    PaperProps={{
+                        sx: { 
+                            backgroundColor: 'rgba(30, 30, 30, 0.95)',
+                            color: 'white',
+                            minWidth: '320px' // Increased width for better layout
+                        }
+                    }}
+                >
+                    <DialogTitle sx={{ borderBottom: '1px solid rgba(255,255,255,0.1)' }}>
+                        {t('addNewPlayerTitle')}
+                    </DialogTitle>
+                    <DialogContent sx={{ mt: 2 }}>
+                        {/* Player appearance section */}
+                        <Box sx={{ 
+                            display: 'flex', 
+                            alignItems: 'center', 
+                            mb: 3,
+                            gap: 2,
+                            justifyContent: 'center'
+                        }}>
+                            <Box sx={{
+                                display: 'flex',
+                                flexDirection: 'column',
+                                alignItems: 'center'
+                            }}>
+                                {/* Avatar Preview */}
+                                <Box sx={{ 
+                                    width: '60px', 
+                                    height: '60px', 
+                                    borderRadius: '50%', 
+                                    backgroundColor: newPlayerColor,
+                                    display: 'flex',
+                                    alignItems: 'center',
+                                    justifyContent: 'center',
+                                    border: '1px solid rgba(255,255,255,0.3)',
+                                    mb: 1
+                                }}>
+                                    <Typography sx={{ fontSize: '32px' }}>
+                                        {newPlayerEmoji}
+                                    </Typography>
+                                </Box>
+                                
+                                {/* EmojiColorPicker */}
+                                <EmojiColorPicker
+                                    value={newPlayerColor}
+                                    onChange={(color) => setNewPlayerColor(color)}
+                                    emoji={newPlayerEmoji}
+                                    onEmojiChange={(emoji) => setNewPlayerEmoji(emoji)}
+                                    colors={[
+                                        { name: 'Blue', value: '#0000FF' },
+                                        { name: 'Red', value: '#FF0000' },
+                                        { name: 'Green', value: '#008000' },
+                                        { name: 'Orange', value: '#FFA500' },
+                                        { name: 'Purple', value: '#800080' },
+                                        { name: 'Pink', value: '#FFC1CC' },
+                                        { name: 'Cyan', value: '#00FFFF' },
+                                        { name: 'Yellow', value: '#FFFF00' }
+                                    ]}
+                                />
+                            </Box>
+                        </Box>
+
+                        {/* Player name input */}
+                        <TextField
+                            autoFocus
+                            margin="dense"
+                            label={t('playerNameHint')}
+                            fullWidth
+                            variant="outlined"
+                            value={newPlayerName}
+                            onChange={(e) => setNewPlayerName(e.target.value)}
+                            sx={{
+                                '& .MuiOutlinedInput-root': {
+                                    color: 'white',
+                                    '& fieldset': {
+                                        borderColor: 'rgba(255, 255, 255, 0.3)',
+                                    },
+                                    '&:hover fieldset': {
+                                        borderColor: 'rgba(255, 255, 255, 0.5)',
+                                    },
+                                    '&.Mui-focused fieldset': {
+                                        borderColor: 'white',
+                                    },
+                                },
+                                '& .MuiInputLabel-root': {
+                                    color: 'silver',
+                                },
+                            }}
+                        />
+                        
+                        <Typography variant="caption" color="silver" sx={{ display: 'block', mt: 1 }}>
+                            {t('newPlayerDefaultInactive')}
+                        </Typography>
+                    </DialogContent>
+                    <DialogActions sx={{ p: 2, borderTop: '1px solid rgba(255,255,255,0.1)' }}>
+                        <Button 
+                            onClick={() => setOpenAddDialog(false)} 
+                            disabled={addingPlayer}
+                            sx={{ color: 'silver' }}
+                        >
+                            {t('cancel')}
+                        </Button>
+                        <Button 
+                            onClick={handleAddPlayer} 
+                            disabled={!newPlayerName.trim() || addingPlayer}
+                            sx={{
+                                backgroundColor: 'white',
+                                color: 'black',
+                                '&:hover': {
+                                    backgroundColor: '#e0e0e0'
+                                },
+                                '&.Mui-disabled': {
+                                    backgroundColor: 'rgba(255,255,255,0.3)',
+                                    color: 'rgba(0,0,0,0.5)'
+                                }
+                            }}
+                        >
+                            {addingPlayer ? t('addingPlayerButton') : t('addPlayerConfirmButton')}
+                        </Button>
+                    </DialogActions>
+                </Dialog>
             </Paper>
         </Container>
     );

@@ -108,6 +108,9 @@
 
     "managePlayersLabel": "Manage Players",
     "managePlayersTitle": "Manage All Players",
+    "addNewPlayerTitle": "Add Player",
+    "addPlayerButton": "Add Player",
+    "newPlayerDefaultInactive": "New players will be inactive by default",
     "dragAndDropInstructions": "Drag and drop players to reorder them. Toggle switches to set active/inactive status.",
     "activeLabel": "Active",
     "inactiveLabel": "Inactive",
@@ -118,6 +121,9 @@
     "activePlayerCountValid": "Active player count must be 4.",
     "autoActivatedPlayerCount": "Auto-activated {{length}} player(s) to maintain required count: {{player}}",
     "autoDeactivatedPlayerCount": "Auto-deactivated {{length}} player(s) to maintain required count: {{player}}",
+
+    "addingPlayerButton": "Adding Player...",
+    "addPlayerConfirmButton": "Add Player",
 
     "east": "East",
     "south": "South",
@@ -151,6 +157,10 @@
     "errorWinnerRequired": "Error: Winner is required.",
     "errorLoserRequired": "Error: Loser is required.",
     "errorScoreRange": "Error: Score must be between {{min}} and {{max}}.",
+    
+    "errorMaxPlayersReachedError": "Error: Maximum number of players reached.",
+    "errorPlayerNameRequiredError": "Error: Player name is required.",
+    "errorFailedToAddPlayer'": "Error: Failed to add player.",
 
     "errorGameMasterToken": "Error: Game master token is missing.",
     "errorSubmitFailed": "Error: Failed to submit round data.",

@@ -49,7 +49,7 @@ function LanguageSwitcher() {
   const isEnglishActive = i18n.language === 'en';
 
   return (
-    <Box sx={{ position: 'absolute', top: { xs: 8, sm: 16 }, right: { xs: 8, sm: 16 }, zIndex: 1100 }}>
+    <Box sx={{ position: 'absolute', top: { xs: 8, sm: 16 }, right: { xs: 8, sm: 16 } }}>
       <Button
         // Use variant="text" as base, apply styles via sx for full control
         // Or keep variant="contained"/"outlined" if preferred
