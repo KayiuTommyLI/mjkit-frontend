@@ -75,7 +75,9 @@ const SortablePlayerItem = ({ player, index, toggleActive, playersArray, activeP
         zIndex: isDragging ? 999 : 1,
         borderBottom: '1px solid rgba(80, 80, 80, 0.2)',
         position: 'relative',
-        cursor: hasMasterToken ? 'inherit' : 'not-allowed' // Change cursor to indicate disabled state
+        cursor: hasMasterToken ? 'inherit' : 'not-allowed', // Change cursor to indicate disabled state
+        // Add this to prevent scrolling during drag on mobile
+        touchAction: isDragging ? 'none' : 'auto'
     };
 
     // If active, add an index indicator with compass direction - use relative position in active players
@@ -132,13 +134,20 @@ const SortablePlayerItem = ({ player, index, toggleActive, playersArray, activeP
                 <div 
                     {...(hasMasterToken ? attributes : {})} 
                     {...(hasMasterToken ? listeners : {})} 
+                    onTouchStart={(e) => {
+                        if (hasMasterToken) {
+                            // Prevent scrolling when starting drag
+                            e.stopPropagation();
+                        }
+                    }}
                     style={{ 
                         position: 'absolute',
                         left: '55px', // Position after the compass indicator
                         top: '50%',
                         transform: 'translateY(-50%)',
                         cursor: hasMasterToken ? 'grab' : 'not-allowed',
-                        opacity: hasMasterToken ? 1 : 0.5
+                        opacity: hasMasterToken ? 1 : 0.5,
+                        touchAction: 'none' // Prevent scrolling on drag handle
                     }}
                 >
                     <DragIndicatorIcon sx={{ color: 'silver' }} />
@@ -227,14 +236,15 @@ const PlayersManagementPage: React.FC = () => {
     const [newPlayerEmoji, setNewPlayerEmoji] = useState<string>('😀');
     const [newPlayerColor, setNewPlayerColor] = useState<string>('#0000FF'); // Default blue
     
-    // Configure sensors for drag interactions
+    // Update the sensors configuration
     const sensors = useSensors(
         useSensor(PointerSensor, {
-            // Disable drag if no master token
+            // Improve touch device handling
             activationConstraint: {
-                delay: 250,
-                tolerance: 5,
-                distance: hasMasterToken ? 0 : Number.POSITIVE_INFINITY // Prevents dragging if no token
+                // Increase the distance threshold for mobile
+                distance: 8, // pixels - must move this far to start drag
+                tolerance: 5, // Allow some wiggle room
+                delay: 250, // ms - must hold before dragging starts
             }
         }),
         useSensor(KeyboardSensor, {
@@ -654,6 +664,13 @@ const PlayersManagementPage: React.FC = () => {
                     sensors={sensors} 
                     collisionDetection={closestCenter} 
                     onDragEnd={handleDragEnd}
+                    onDragStart={() => {
+                        // Add a class to the body to prevent scrolling during drag
+                        document.body.classList.add('dragging');
+                    }}
+                    onDragCancel={() => {
+                        document.body.classList.remove('dragging');
+                    }}
                 >
                     {/* Use one SortableContext for all players */}
                     <SortableContext 

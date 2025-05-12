@@ -272,6 +272,86 @@ const RoundEntryModal: React.FC<RoundEntryModalProps> = ({
                             </FormControl>
                         </Grid>
 
+                        {/* Score Select */}
+                        <Grid item xs={12} sm={8} {...({} as any)}>
+                            <Box sx={{ mt: 3, mb: 1 }}>
+                                <Typography variant="body2" color="silver" gutterBottom>
+                                    {t('scoreRefFaanHeader')}
+                                </Typography>
+                                
+                                <Box sx={{ 
+                                    display: 'flex', 
+                                    flexDirection: 'column',
+                                    alignItems: 'center',
+                                    px: 2
+                                }}>
+                                    {/* Current score display */}
+                                    <Typography variant="h4" color="white" sx={{ mb: 1 }}>
+                                        {scoreValue}
+                                    </Typography>
+
+                                    {/* Slider component */}
+                                    <Slider
+                                        value={scoreValue}
+                                        onChange={(_, value) => setScoreValue(value as number)}
+                                        step={1}
+                                        marks
+                                        min={scoreLimits.min}
+                                        max={scoreLimits.max}
+                                        valueLabelDisplay="auto"
+                                        aria-labelledby="score-slider"
+                                        sx={{
+                                            width: '100%',
+                                            color: 'white',
+                                            '& .MuiSlider-rail': {
+                                                backgroundColor: 'rgba(255, 255, 255, 0.3)',
+                                            },
+                                            '& .MuiSlider-track': {
+                                                backgroundColor: 'white',
+                                            },
+                                            '& .MuiSlider-thumb': {
+                                                backgroundColor: 'white',
+                                                '&:hover, &.Mui-focusVisible': {
+                                                    boxShadow: '0 0 0 8px rgba(255, 255, 255, 0.16)'
+                                                }
+                                            },
+                                            '& .MuiSlider-mark': {
+                                                backgroundColor: 'silver',
+                                                height: 4,
+                                            },
+                                            '& .MuiSlider-markActive': {
+                                                backgroundColor: 'white', 
+                                            }
+                                        }}
+                                    />
+                                    
+                                    {/* Money value display */}
+                                    <Box sx={{ 
+                                        mt: 2,
+                                        p: 1, 
+                                        border: '1px solid rgba(255, 255, 255, 0.2)',
+                                        borderRadius: '4px',
+                                        backgroundColor: 'rgba(255, 255, 255, 0.05)',
+                                        width: '100%',
+                                        textAlign: 'center'
+                                    }}>
+                                        <Typography variant="body1" color="silver">
+                                            {t('moneyValue')}:
+                                        </Typography>
+                                        <Typography variant="h5" color="lightgreen" sx={{ fontWeight: 'bold' }}>
+                                            ${moneyValue}
+                                        </Typography>
+                                        
+                                        {winType === WinType.SELF_DRAW_ALL_PAY && (
+                                            <Typography variant="body2" color="silver" sx={{ mt: 0.5 }}>
+                                                {t('perPlayer', { money: perPlayerPayment })}
+                                            </Typography>
+                                        )}
+                                    </Box>
+                                </Box>
+                            </Box>
+                        </Grid>
+                        
                         {/* Winner Radio Group */}
                         <Grid item xs={12}>
                             <Typography component="legend" variant="body2" sx={{ mb: 1, color: 'silver' }}>
@@ -483,85 +563,6 @@ const RoundEntryModal: React.FC<RoundEntryModalProps> = ({
                             </Grid>
                         )}
 
-                        {/* Score Select */}
-                        <Grid item xs={12} sm={8} {...({} as any)}>
-                            <Box sx={{ mt: 3, mb: 1 }}>
-                                <Typography variant="body2" color="silver" gutterBottom>
-                                    {t('scoreRefFaanHeader')}
-                                </Typography>
-                                
-                                <Box sx={{ 
-                                    display: 'flex', 
-                                    flexDirection: 'column',
-                                    alignItems: 'center',
-                                    px: 2
-                                }}>
-                                    {/* Current score display */}
-                                    <Typography variant="h4" color="white" sx={{ mb: 1 }}>
-                                        {scoreValue}
-                                    </Typography>
-
-                                    {/* Slider component */}
-                                    <Slider
-                                        value={scoreValue}
-                                        onChange={(_, value) => setScoreValue(value as number)}
-                                        step={1}
-                                        marks
-                                        min={scoreLimits.min}
-                                        max={scoreLimits.max}
-                                        valueLabelDisplay="auto"
-                                        aria-labelledby="score-slider"
-                                        sx={{
-                                            width: '100%',
-                                            color: 'white',
-                                            '& .MuiSlider-rail': {
-                                                backgroundColor: 'rgba(255, 255, 255, 0.3)',
-                                            },
-                                            '& .MuiSlider-track': {
-                                                backgroundColor: 'white',
-                                            },
-                                            '& .MuiSlider-thumb': {
-                                                backgroundColor: 'white',
-                                                '&:hover, &.Mui-focusVisible': {
-                                                    boxShadow: '0 0 0 8px rgba(255, 255, 255, 0.16)'
-                                                }
-                                            },
-                                            '& .MuiSlider-mark': {
-                                                backgroundColor: 'silver',
-                                                height: 4,
-                                            },
-                                            '& .MuiSlider-markActive': {
-                                                backgroundColor: 'white', 
-                                            }
-                                        }}
-                                    />
-                                    
-                                    {/* Money value display */}
-                                    <Box sx={{ 
-                                        mt: 2,
-                                        p: 1, 
-                                        border: '1px solid rgba(255, 255, 255, 0.2)',
-                                        borderRadius: '4px',
-                                        backgroundColor: 'rgba(255, 255, 255, 0.05)',
-                                        width: '100%',
-                                        textAlign: 'center'
-                                    }}>
-                                        <Typography variant="body1" color="silver">
-                                            {t('moneyValue')}:
-                                        </Typography>
-                                        <Typography variant="h5" color="lightgreen" sx={{ fontWeight: 'bold' }}>
-                                            ${moneyValue}
-                                        </Typography>
-                                        
-                                        {winType === WinType.SELF_DRAW_ALL_PAY && (
-                                            <Typography variant="body2" color="silver" sx={{ mt: 0.5 }}>
-                                                {t('perPlayer', { money: perPlayerPayment })}
-                                            </Typography>
-                                        )}
-                                    </Box>
-                                </Box>
-                            </Box>
-                        </Grid>
                         {error && <Grid item xs={12} {...({} as any)}><Alert severity="error" variant="outlined" sx={{mt: 1}}>{error}</Alert></Grid>}
                     </Grid>
                 </Box>
