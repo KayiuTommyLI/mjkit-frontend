@@ -392,6 +392,12 @@ const PlayersManagementPage: React.FC = () => {
     const handleDragEnd = (event: DragEndEvent) => {
         const { active, over } = event;
         
+        // Remove the dragging class from the element
+        const draggedElement = document.getElementById(active.id.toString());
+        if (draggedElement) {
+            draggedElement.classList.remove('dragging-item');
+        }
+        
         if (!over || active.id === over.id) {
             return;
         }

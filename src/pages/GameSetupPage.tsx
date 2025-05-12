@@ -67,7 +67,8 @@ const availableColors = [
   { name: 'Purple', value: '#800080' },
   { name: 'Pink', value: '#FFC1CC' },
 ];
-const defaultPlayerNames = ['Player 1', 'Player 2', 'Player 3', 'Player 4'];
+// const defaultPlayerNames = ['Player 1', 'Player 2', 'Player 3', 'Player 4'];
+const defaultPlayerNames = ['', '', '', ''];
 const initialOffset = 0; // Default initial offset for players
 const maxMoneyOptions = [8, 16, 24, 32, 48, 64, 96, 128, 256, 512, 1024];  // 8 to 1024
 const defaultEmoji = ['👺', '👻', '👼', '🐼', '🌝', '🤠', '🤡', '🦁', '🐮', '🐷'];
@@ -203,8 +204,17 @@ const GameSetupPage: React.FC = () => {
 
     const handlePlayerOffsetChange = (index: number, value: string) => {
         const newPlayers = [...players];
-        const parsedValue = parseFloat(value);
-        newPlayers[index].initial_offset = isNaN(parsedValue) ? 0 : parsedValue; // Store as number
+        
+        // If value is just a minus sign, store it temporarily as a string
+        // to allow the user to continue typing a negative number
+        if (value === '-' || value === '' || value[0] == '.'|| value[value.length-1] == '.') {
+            newPlayers[index].initial_offset = value;
+        } else {
+            // Otherwise parse as float
+            const parsedValue = parseFloat(value);
+            newPlayers[index].initial_offset = isNaN(parsedValue) ? 0 : parsedValue;
+        }
+        
         setPlayers(newPlayers);
         if (offsetError) setOffsetError(null);
     };
@@ -505,9 +515,23 @@ const GameSetupPage: React.FC = () => {
                                     }}>
                                         <TextField
                                             label={t('playerInitialOffsetLabel')} 
-                                            type="number" 
+                                            type="text" 
                                             value={player.initial_offset}
-                                            onChange={(e) => handlePlayerOffsetChange(index, e.target.value)}
+                                            onChange={(e) => {
+                                                // Enhanced handler with improved regex for decimal numbers
+                                                const value = e.target.value;
+                                                // Allow empty string, minus sign, or valid decimal number formats
+                                                if (
+                                                    value === '' || 
+                                                    value === '-' || 
+                                                    value === '.' || 
+                                                    value === '-.' ||
+                                                    /^-?\d+\.?\d*$/.test(value) || // Complete numbers with optional decimal part
+                                                    /^-?\d*\.\d+$/.test(value)     // Decimal numbers like .5
+                                                ) {
+                                                    handlePlayerOffsetChange(index, value);
+                                                }
+                                            }}
                                             variant="outlined" 
                                             size="small"
                                             fullWidth
@@ -516,12 +540,8 @@ const GameSetupPage: React.FC = () => {
                                                     <Typography color="white">$</Typography>
                                                 </InputAdornment> 
                                             }}
-                                            // Fix step control with more precise configuration
                                             inputProps={{ 
-                                                step: 0.1,  // Use number instead of string
-                                                min: -999999,  // Add reasonable min/max
-                                                max: 999999,
-                                                style: { color: 'white' }  // Ensure text color consistency
+                                                style: { color: 'white' }
                                             }} 
                                             sx={inputStyles}
                                         />

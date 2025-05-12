@@ -5,7 +5,7 @@
     "gameSetupSubtitle": "請選擇牌局規則同埋玩家",
 
     "player": "玩家",    
-    "playerLabel": "玩家 {{index}}",
+    "playerLabel": "玩家 {{index}} 名稱",
     "playerNameHint": "玩家名稱",
     "playerColorLabel": "代表顏色",
     "playerInitialOffsetLabel": "初始餘額 ($)",
@@ -98,6 +98,9 @@
     "winTypeSelfDrawOne": "包自摸",
     "moneyValue": "賺左",
     "perPlayer": "枱邊玩家每人輸 ${{money}}",
+    "winnerReceivesFromLoser": "{{winner}} 收 {{loser}} ${{money}}",
+    "winnerReceivesTotalFromAll": "{{winner}} 總共收 ${{total}} (每人 ${{perPlayer}})",
+
     "selectLoser": "輸家",
 
     "submitting": "提交中...",

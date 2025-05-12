@@ -335,12 +335,37 @@ const RoundEntryModal: React.FC<RoundEntryModalProps> = ({
                                         width: '100%',
                                         textAlign: 'center'
                                     }}>
-                                        <Typography variant="body1" color="silver">
+                                        {/* <Typography variant="body1" color="silver">
                                             {t('moneyValue')}:
-                                        </Typography>
+                                        </Typography> */}
                                         <Typography variant="h5" color="lightgreen" sx={{ fontWeight: 'bold' }}>
                                             ${moneyValue}
                                         </Typography>
+                                        
+                                        {/* Winner/Loser Names Display */}
+                                        {winnerId && (
+                                            <Typography variant="body2" color="silver" sx={{ mt: 0.5 }}>
+                                                {(() => {
+                                                    const winner = activePlayers.find(p => p.game_player_id === winnerId)?.player_name_in_game || '';
+                                                    
+                                                    if (winType === WinType.SELF_DRAW_ALL_PAY) {
+                                                        return t('winnerReceivesTotalFromAll', { 
+                                                            winner: winner,
+                                                            total: moneyValue,
+                                                            perPlayer: perPlayerPayment.toFixed(2)
+                                                        });
+                                                    } else if (winType === WinType.NORMAL || winType === WinType.SELF_DRAW_ONE_PAY) {
+                                                        const loser = activePlayers.find(p => p.game_player_id === loserId)?.player_name_in_game || '';
+                                                        return loserId ? t('winnerReceivesFromLoser', {
+                                                            winner: winner,
+                                                            money: moneyValue,
+                                                            loser: loser
+                                                        }) : '';
+                                                    }
+                                                    return '';
+                                                })()}
+                                            </Typography>
+                                        )}
                                         
                                         {winType === WinType.SELF_DRAW_ALL_PAY && (
                                             <Typography variant="body2" color="silver" sx={{ mt: 0.5 }}>
