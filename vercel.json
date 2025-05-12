@@ -1,0 +1,31 @@
+{
+  "rewrites": [
+    // 1. Rewrite asset requests under /mjkit-frontend/assets/
+    //    to serve from the actual /assets/ folder in your build output.
+    {
+      "source": "/mjkit-frontend/assets/(.*)",
+      "destination": "/assets/$1"
+    },
+
+    // 2. Rewrite requests for public files (e.g., favicon.ico, manifest.json)
+    //    that are referenced with the /mjkit-frontend/ prefix.
+    //    This assumes Vite copies them to the root of your 'dist' folder.
+    //    This rule matches paths like /mjkit-frontend/favicon.ico
+    {
+      "source": "/mjkit-frontend/([^/]+\\.[^/]+)$",
+      "destination": "/$1"
+    },
+
+    // 3. For any other route under /mjkit-frontend/ (your SPA's pages)
+    //    or for /mjkit-frontend itself, serve the main index.html.
+    //    This index.html is built to work with the /mjkit-frontend/ base path.
+    {
+      "source": "/mjkit-frontend/(.*)",
+      "destination": "/index.html"
+    },
+    {
+      "source": "/mjkit-frontend",
+      "destination": "/index.html"
+    }
+  ]
+}

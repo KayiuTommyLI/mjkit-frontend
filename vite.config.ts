@@ -13,8 +13,8 @@ export default defineConfig(({ command }) => {
     // Apply the specific base path only when building for production
     if (command === 'build') {
       // Replace <your-repo-name> with your actual repository name!
-      // config.base = '/mjkit-frontend/'
-      config.base = '/'
+      config.base = '/mjkit-frontend/'
+      // config.base = '/'
     }
   
     return config

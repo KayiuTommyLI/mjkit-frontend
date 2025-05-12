@@ -125,7 +125,11 @@ const SortablePlayerItem = ({ player, index, toggleActive, playersArray, activeP
     ) : null;
     
     return (
-        <div ref={setNodeRef} style={style}>
+        <div 
+            ref={setNodeRef} 
+            style={style} 
+            id={player.game_player_id} // Add ID for targeting during drag
+        >
             {/* Show compass indicator */}
             {indexIndicator}
             
@@ -136,7 +140,7 @@ const SortablePlayerItem = ({ player, index, toggleActive, playersArray, activeP
                     {...(hasMasterToken ? listeners : {})} 
                     onTouchStart={(e) => {
                         if (hasMasterToken) {
-                            // Prevent scrolling when starting drag
+                            // Prevent scrolling only when starting drag from handle
                             e.stopPropagation();
                         }
                     }}
@@ -147,7 +151,12 @@ const SortablePlayerItem = ({ player, index, toggleActive, playersArray, activeP
                         transform: 'translateY(-50%)',
                         cursor: hasMasterToken ? 'grab' : 'not-allowed',
                         opacity: hasMasterToken ? 1 : 0.5,
-                        touchAction: 'none' // Prevent scrolling on drag handle
+                        touchAction: 'none', // Prevent scrolling only on the handle
+                        width: '24px',      // Make the handle easier to grab
+                        height: '24px',     // with a larger touch target
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'center'
                     }}
                 >
                     <DragIndicatorIcon sx={{ color: 'silver' }} />
@@ -236,15 +245,17 @@ const PlayersManagementPage: React.FC = () => {
     const [newPlayerEmoji, setNewPlayerEmoji] = useState<string>('😀');
     const [newPlayerColor, setNewPlayerColor] = useState<string>('#0000FF'); // Default blue
     
-    // Update the sensors configuration
+    // Update the sensors configuration with more intentional activation constraints
     const sensors = useSensors(
         useSensor(PointerSensor, {
-            // Improve touch device handling
+            // Configure to only start dragging after a clear intentional gesture
             activationConstraint: {
-                // Increase the distance threshold for mobile
-                distance: 8, // pixels - must move this far to start drag
-                tolerance: 5, // Allow some wiggle room
-                delay: 250, // ms - must hold before dragging starts
+                // Require a more deliberate drag distance before starting
+                distance: 8,
+                // Only respond to drags from the handle, not the entire item
+                tolerance: 0,
+                // No delay as we're using the handle for dragging
+                delay: 0,
             }
         }),
         useSensor(KeyboardSensor, {
@@ -664,12 +675,19 @@ const PlayersManagementPage: React.FC = () => {
                     sensors={sensors} 
                     collisionDetection={closestCenter} 
                     onDragEnd={handleDragEnd}
-                    onDragStart={() => {
-                        // Add a class to the body to prevent scrolling during drag
-                        document.body.classList.add('dragging');
+                    onDragStart={(event) => {
+                        // Add class only to the dragged element, not the whole body
+                        const draggedElement = document.getElementById(event.active.id.toString());
+                        if (draggedElement) {
+                            draggedElement.classList.add('dragging-item');
+                        }
                     }}
-                    onDragCancel={() => {
-                        document.body.classList.remove('dragging');
+                    onDragCancel={(event) => {
+                        // Remove class from the specific element
+                        const draggedElement = document.getElementById(event.active.id.toString());
+                        if (draggedElement) {
+                            draggedElement.classList.remove('dragging-item');
+                        }
                     }}
                 >
                     {/* Use one SortableContext for all players */}

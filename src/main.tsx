@@ -25,8 +25,8 @@ document.title = i18n.t('appTitle');
 ReactDOM.createRoot(document.getElementById('root')!).render(
   <React.StrictMode>
     {/* Replace BrowserRouter with HashRouter */}
-    <HashRouter>
+    {/* <HashRouter> */}
       <App />
-    </HashRouter>
+    {/* </HashRouter> */}
   </React.StrictMode>,
 )
