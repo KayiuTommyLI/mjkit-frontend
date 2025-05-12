@@ -36,7 +36,7 @@ interface InitialPlayerDto {
     player_color_in_game: string;
     player_emoji_in_game: string;
     player_order: number;
-    initial_offset?: number;
+    initial_offset?: number | string; // Allow both types
 }
 
 interface CreateGamePayload {
@@ -48,6 +48,15 @@ interface CreateGamePayload {
     five_player_mode_rule?: boolean;
     game_name?: string;
     initial_players: InitialPlayerDto[];
+}
+
+// Add this interface at the top of your file or update existing type
+interface Player {
+  id: number;
+  name: string;
+  color: string;
+  initial_offset: number | string; // Allow both string and number
+  emoji: string;
 }
 
 // --- Default Values ---
@@ -81,7 +90,7 @@ const GameSetupPage: React.FC = () => {
     const { t, i18n } = useTranslation();
 
     // --- State ---
-    const [players, setPlayers] = useState(() =>
+    const [players, setPlayers] = useState<Player[]>(() =>
         defaultPlayerNames.map((name, index) => ({
             id: index,
             name: name,
@@ -322,7 +331,9 @@ const GameSetupPage: React.FC = () => {
                 player_color_in_game: player.color,
                 player_emoji_in_game: player.emoji,
                 player_order: index,
-                initial_offset: player.initial_offset || 0,
+                initial_offset: typeof player.initial_offset === 'string' 
+                    ? parseFloat(player.initial_offset) || 0 
+                    : player.initial_offset || 0,
             })),
         };
 
