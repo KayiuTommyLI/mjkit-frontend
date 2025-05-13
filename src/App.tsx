@@ -16,13 +16,18 @@ function App() {
       <Box sx={{ 
         display: 'flex', 
         flexDirection: 'column',
-        minHeight: '100vh' // Ensure full viewport height
+        minHeight: '100vh',
+        maxWidth: '100%' // Ensure full width usage
       }}>
         <LanguageSwitcher />
         
         <Box sx={{ 
           flex: '1 0 auto', 
-          pb: 3
+          pb: 3,
+          px: { xs: 0.05, sm: 0.1 }, // Reduce horizontal padding (was default 3)
+          width: '100%', 
+          maxWidth: '100%',
+          boxSizing: 'border-box'
         }}>
           <Routes>
             <Route path="/" element={<GameSetupPage />} />

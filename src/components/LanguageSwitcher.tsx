@@ -49,15 +49,18 @@ function LanguageSwitcher() {
   const isEnglishActive = i18n.language === 'en';
 
   return (
-    <Box sx={{ position: 'absolute', top: { xs: 8, sm: 16 }, right: { xs: 8, sm: 16 } }}>
+    <Box sx={{ 
+      display: 'flex',
+      justifyContent: 'flex-end',  // Right-align the buttons
+      padding: { xs: '8px 16px', sm: '16px' },  // Add padding around buttons
+      position: 'relative',  // Change from absolute to relative positioning
+      zIndex: 10  // Ensure it stays above other content
+    }}>
       <Button
-        // Use variant="text" as base, apply styles via sx for full control
-        // Or keep variant="contained"/"outlined" if preferred
-        variant={isChineseActive ? 'contained' : 'outlined'} // Keep conditional variant if you like the slight elevation difference
+        variant={isChineseActive ? 'contained' : 'outlined'}
         onClick={() => changeLanguage('zh-Hant')}
-        // Apply specific style object based on active state
         sx={isChineseActive ? activeSx : inactiveSx}
-        disableElevation={isChineseActive} // Optional: remove shadow from contained button
+        disableElevation={isChineseActive}
       >
         {t('langChinese')}
       </Button>
@@ -65,7 +68,7 @@ function LanguageSwitcher() {
         variant={isEnglishActive ? 'contained' : 'outlined'}
         onClick={() => changeLanguage('en')}
         sx={isEnglishActive ? activeSx : inactiveSx}
-        disableElevation={isEnglishActive} // Optional: remove shadow from contained button
+        disableElevation={isEnglishActive}
       >
         {t('langEnglish')}
       </Button>

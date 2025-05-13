@@ -32,6 +32,19 @@ interface ProcessedDataPoint {
     [playerKey: string]: number | string;
 }
 
+const getBrightness = (hexColor: string): number => {
+    // Remove # if present
+    const hex = hexColor.replace('#', '');
+    
+    // Convert hex to RGB
+    const r = parseInt(hex.substring(0, 2), 16);
+    const g = parseInt(hex.substring(2, 4), 16);
+    const b = parseInt(hex.substring(4, 6), 16);
+    
+    // Calculate brightness using perceived luminance formula
+    return (r * 299 + g * 587 + b * 114) / 1000;
+};
+
 const BalanceTrendChart: React.FC<BalanceTrendChartProps> = ({ rounds, players }) => {
     const { t } = useTranslation();
     const theme = useTheme();
@@ -230,7 +243,6 @@ const BalanceTrendChart: React.FC<BalanceTrendChartProps> = ({ rounds, players }
                                         <div style={{ 
                                             textAlign: 'center', 
                                             padding: '10px 0', 
-                                            color: 'silver',
                                             display: 'flex',
                                             justifyContent: 'center',
                                             gap: isMobile ? '8px' : '15px',
@@ -241,6 +253,10 @@ const BalanceTrendChart: React.FC<BalanceTrendChartProps> = ({ rounds, players }
                                                 const player = players.find(p => p.game_player_id === entry.value);
                                                 if (!player) return null;
                                                 
+                                                // Calculate text color based on background color brightness
+                                                const color = player.player_color_in_game;
+                                                const isLightColor = getBrightness(color) > 128;
+                                                
                                                 return (
                                                     <span 
                                                         key={`legend-item-${index}`}
@@ -248,7 +264,10 @@ const BalanceTrendChart: React.FC<BalanceTrendChartProps> = ({ rounds, players }
                                                             display: 'inline-flex', 
                                                             alignItems: 'center', 
                                                             marginRight: isMobile ? '5px' : '10px',
-                                                            color: entry.color
+                                                            backgroundColor: color,
+                                                            padding: '2px 8px',
+                                                            borderRadius: '12px',
+                                                            border: '1px solid rgba(255,255,255,0.3)',
                                                         }}
                                                     >
                                                         <span 
@@ -259,7 +278,10 @@ const BalanceTrendChart: React.FC<BalanceTrendChartProps> = ({ rounds, players }
                                                         >
                                                             {player.player_emoji_in_game || ''}
                                                         </span>
-                                                        <span>{
+                                                        <span style={{
+                                                            color: isLightColor ? '#000000' : '#ffffff',
+                                                            fontWeight: 'bold'
+                                                        }}>{
                                                             isMobile && player.player_name_in_game.length > 6 
                                                                 ? `${player.player_name_in_game.substring(0, 5)}…` 
                                                                 : player.player_name_in_game
