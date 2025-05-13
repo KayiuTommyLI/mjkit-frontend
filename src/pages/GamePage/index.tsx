@@ -250,6 +250,33 @@ const GamePage: React.FC = () => {
                         error={scoreTableError}
                     />
                     
+                    {/* Game history table */}
+                    <Box sx={{ mt: 4 }}>
+                        <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 2 }}>
+                            <h2 style={{ margin: 0, color: 'white' }}>
+                                {t('roundHistoryHeader')}
+                            </h2>
+                        </Box>
+                        
+                        <GameHistoryTable
+                            rounds={rounds}
+                            activePlayers={gameData.gamePlayers}
+                            loading={loadingRounds}
+                            error={roundsError}
+                            onDeleteRequest={handleDeleteRoundRequest}
+                            isDeleting={isDeletingRound}
+                            gameId={gameId} // Add this prop
+                            sx={{
+                                '& .MuiTableHead-root': { backgroundColor: 'rgba(0, 0, 0, 0.2)' },
+                                '& .MuiTableRow-root': {
+                                    '&:nth-of-type(odd)': { backgroundColor: 'rgba(255, 255, 255, 0.05)' },
+                                    '&:hover': { backgroundColor: 'rgba(255, 255, 255, 0.1)' }
+                                },
+                                '& .MuiTableCell-root': { borderColor: 'rgba(192, 192, 192, 0.3)', color: 'white' }
+                            }}
+                        />
+                    </Box>
+
                     {/* Balance trend chart */}
                     <Box sx={{ mt: 4 }}>
                         <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 1 }}>
@@ -280,32 +307,6 @@ const GamePage: React.FC = () => {
                         )}
                     </Box>
                     
-                    {/* Game history table */}
-                    <Box sx={{ mt: 4 }}>
-                        <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 2 }}>
-                            <h2 style={{ margin: 0, color: 'white' }}>
-                                {t('roundHistoryHeader')}
-                            </h2>
-                        </Box>
-                        
-                        <GameHistoryTable
-                            rounds={rounds}
-                            activePlayers={gameData.gamePlayers}
-                            loading={loadingRounds}
-                            error={roundsError}
-                            onDeleteRequest={handleDeleteRoundRequest}
-                            isDeleting={isDeletingRound}
-                            gameId={gameId} // Add this prop
-                            sx={{
-                                '& .MuiTableHead-root': { backgroundColor: 'rgba(0, 0, 0, 0.2)' },
-                                '& .MuiTableRow-root': {
-                                    '&:nth-of-type(odd)': { backgroundColor: 'rgba(255, 255, 255, 0.05)' },
-                                    '&:hover': { backgroundColor: 'rgba(255, 255, 255, 0.1)' }
-                                },
-                                '& .MuiTableCell-root': { borderColor: 'rgba(192, 192, 192, 0.3)', color: 'white' }
-                            }}
-                        />
-                    </Box>
                 </Paper>
             </Container>
             
