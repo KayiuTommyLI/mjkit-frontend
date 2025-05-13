@@ -180,14 +180,70 @@ const GameHistoryTable: React.FC<GameHistoryTableProps> = ({
                                             sx={{ 
                                                 color: 'white',
                                                 ...headerTextStyle,
-                                                width: '70px',
-                                                backgroundColor: player?.player_color_in_game || 'transparent',
-                                                opacity: 0.9,
-                                                border: '1px solid rgba(192, 192, 192, 0.3)',
-                                                fontSize: '2rem',
+                                                width: 'auto', // Allow cell to expand for player names
+                                                backgroundColor: 'transparent', // Remove background color
+                                                border: 'transparent', // Remove border
+                                                padding: '8px 4px', // Reduce padding
+                                                position: 'relative' // For positioning the player name
                                             }}
                                         >
-                                            {player?.player_emoji_in_game || ''}
+                                            <Box sx={{ 
+                                                display: 'flex',
+                                                flexDirection: 'column',
+                                                alignItems: 'center',
+                                                gap: 1
+                                            }}>
+                                                {/* Emoji with colored circular background - make clickable */}
+                                                <Tooltip title={player?.player_name_in_game} placement="top">
+                                                    <Box 
+                                                        sx={{ 
+                                                            width: 32, 
+                                                            height: 32, 
+                                                            borderRadius: '50%', 
+                                                            backgroundColor: player?.player_color_in_game,
+                                                            display: 'flex',
+                                                            alignItems: 'center',
+                                                            justifyContent: 'center',
+                                                            border: '1px solid rgba(255,255,255,0.2)',
+                                                            cursor: 'pointer',
+                                                            transition: 'transform 0.2s',
+                                                            '&:hover': {
+                                                                transform: 'scale(1.1)',
+                                                            }
+                                                        }}
+                                                        onClick={() => setExpandedPlayerId(expandedPlayerId === playerId ? null : playerId)}
+                                                    >
+                                                        <Typography 
+                                                            sx={{ 
+                                                                fontSize: '1.2rem',
+                                                                lineHeight: 1
+                                                            }}
+                                                        >
+                                                            {player?.player_emoji_in_game}
+                                                        </Typography>
+                                                    </Box>
+                                                </Tooltip>
+                                                
+                                                {/* Player name only shows when clicked */}
+                                                {expandedPlayerId === playerId && (
+                                                    <Typography 
+                                                        sx={{ 
+                                                            color: 'white',
+                                                            fontSize: '0.75rem',
+                                                            fontWeight: 'bold',
+                                                            maxWidth: '70px',
+                                                            textAlign: 'center',
+                                                            animation: 'fadeIn 0.3s',
+                                                            '@keyframes fadeIn': {
+                                                                '0%': { opacity: 0, transform: 'translateY(-5px)' },
+                                                                '100%': { opacity: 1, transform: 'translateY(0)' }
+                                                            }
+                                                        }}
+                                                    >
+                                                        {player?.player_name_in_game}
+                                                    </Typography>
+                                                )}
+                                            </Box>
                                         </TableCell>
                                     );
                                 })}
