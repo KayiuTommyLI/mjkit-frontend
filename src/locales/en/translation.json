@@ -113,7 +113,7 @@
     "addNewPlayerTitle": "Add Player",
     "addPlayerButton": "Add Player",
     "newPlayerDefaultInactive": "New players will be inactive by default",
-    "dragAndDropInstructions": "Drag and drop players to reorder them. Toggle switches to set active/inactive status.",
+    "dragAndDropInstructions": "Drag and drop the dots beside the players to reorder them. Toggle switches to set active/inactive status.",
     "activeLabel": "Active",
     "inactiveLabel": "Inactive",
     "saveChangesLabel": "Save Changes",

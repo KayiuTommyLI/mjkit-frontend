@@ -62,7 +62,8 @@ const ShareGameDialog: React.FC<ShareGameDialogProps> = ({ open, onClose, gameId
     const generateShareUrl = () => {
         // Use hash-based URL format that works with HashRouter
         const currentPath = window.location.pathname;
-        const baseUrl = `${window.location.origin}${currentPath}#/game/${gameId}`;
+  //      const baseUrl = `${window.location.origin}${currentPath}#/game/${gameId}`;
+        const baseUrl = `${window.location.origin}${currentPath}`;
         
         if (includeAdminRights && hasMasterToken) {
             const token = localStorage.getItem(`gameMasterToken_${gameId}`);
