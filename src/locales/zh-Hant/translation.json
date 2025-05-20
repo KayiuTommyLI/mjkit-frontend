@@ -32,6 +32,9 @@
     "gameStatusLabel": "狀態",
     "gameRulesLabel": "規則",
     "gameNameLabel": "牌局名稱(選填)",
+    
+    "hintChangeEmojiOnClick": "提示: 㩒Emoji揀顏色同Emoji。",
+
     "maxMoneyLabel": "最大打幾多錢",
     "maxScoreLabel": "最大打幾多番",
     "minScoreLabel": "幾番起糊",

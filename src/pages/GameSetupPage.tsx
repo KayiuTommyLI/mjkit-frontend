@@ -463,6 +463,18 @@ const GameSetupPage: React.FC = () => {
                                     </Button>
                                 </Box>
                             </Box>
+                            <Typography 
+                                variant="caption" 
+                                color="white" /* Using a theme color for subtlety */
+                                sx={{ 
+                                    mb: 2, /* Keep margin before player list */
+                                    display: 'block', 
+                                    textAlign: 'left', /* Align with player items */
+                                    fontStyle: 'italic' /* Optional: make it look more like a hint */
+                                }}
+                            >
+                                {t('hintChangeEmojiOnClick')}
+                            </Typography>
                             {players.map((player, index) => (
                                 <Box
                                     key={player.id}

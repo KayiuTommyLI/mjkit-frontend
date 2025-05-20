@@ -1,5 +1,5 @@
 import React, { useEffect } from 'react';
-import { useParams, useNavigate } from 'react-router-dom';
+import { useParams, useNavigate, useLocation } from 'react-router-dom'; // Add useLocation
 import { useTranslation } from 'react-i18next';
 import { Container, Paper, Divider, Alert, Box, CircularProgress, Typography } from '@mui/material';
 
@@ -26,7 +26,8 @@ const GamePage: React.FC = () => {
     const { t } = useTranslation();
     const { gameId } = useParams<{ gameId: string }>();
     const navigate = useNavigate();
-    
+    const location = useLocation(); // Get location object
+
     // Custom hooks for data and functionality
     const {
         gameData,
@@ -74,45 +75,30 @@ const GamePage: React.FC = () => {
         handleCloseNewGameDialog
     } = useDialogs(gameId || '', handleRoundSubmitSuccess, canAddRound);
     
-    // Extract admin token from URL hash if present
+    // Extract admin token from URL query parameters if present
     useEffect(() => {
         if (!gameId) return;
-        
+
         try {
-            // With HashRouter, URL format is: baseUrl/#/path?queryParams
-            // We need to extract query params from the hash portion
-            const hash = window.location.hash;
-            
-            // Find where the query string starts (after the ?)
-            const queryIndex = hash.indexOf('?');
-            
-            if (queryIndex !== -1) {
-                // Extract query string portion
-                const queryString = hash.substring(queryIndex + 1);
-                const params = new URLSearchParams(queryString);
-                const adminToken = params.get('admin');
-                
-                if (adminToken) {
-                    console.log("Found admin token in URL");
-                    // Save the token to localStorage
-                    localStorage.setItem(`gameMasterToken_${gameId}`, adminToken);
-                    
-                    // Remove the token from URL for security
-                    // Keep just the path part without the query params
-                    const pathOnly = hash.substring(0, queryIndex);
-                    window.history.replaceState(null, '', pathOnly);
-                    
-                    // Force refresh of game data to reflect new permissions
-                    fetchGameData();
-                    
-                    // Optional: Show confirmation to the user
-                    // For example, set a state that shows a temporary notification
-                }
+            // With BrowserRouter, query params are in location.search
+            const searchParams = new URLSearchParams(location.search);
+            const adminToken = searchParams.get('admin');
+
+            if (adminToken) {
+                console.log("Found admin token in URL query parameters");
+                // Save the token to localStorage
+                localStorage.setItem(`gameMasterToken_${gameId}`, adminToken);
+
+                // Remove the token from URL for security by navigating to the same path without query params
+                navigate(location.pathname, { replace: true });
+
+                // Force refresh of game data to reflect new permissions
+                fetchGameData();
             }
         } catch (error) {
             console.error("Error processing admin token from URL:", error);
         }
-    }, [gameId, fetchGameData]);
+    }, [gameId, location.search, navigate, fetchGameData]); // Add location.search and navigate to dependencies
     
     // Combined loading state
     if (loadingGame && !gameData) {

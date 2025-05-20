@@ -32,6 +32,8 @@
     "gameRulesLabel": "Game Rules",
     "gameNameLabel": "Game Name (Optional)",
 
+    "hintChangeEmojiOnClick": "Hint: Tap the icon to change emoji & color.",
+    
     "maxMoneyLabel": "Max Money",
     "maxScoreLabel": "Max Score (Faan)",
     "minScoreLabel": "Min Score (Faan)",

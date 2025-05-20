@@ -34,12 +34,14 @@ export const PlayerCard: React.FC<PlayerCardProps> = ({ player, stats, position,
                         
                         {stats.wins.total > 0 && (
                             <Typography variant="caption" component="span">
+                                (  
                                 {stats.wins.direct > 0 && 
                                     `${t('directWin')}: ${stats.wins.direct} `}
                                 {stats.wins.self_draw > 0 && 
                                     `${t('selfDraw')}: ${stats.wins.self_draw} `}
                                 {stats.wins.one_pay > 0 && 
                                     `${t('paoWin')}: ${stats.wins.one_pay}`}
+                                )
                             </Typography>
                         )}
                     </Box>
@@ -52,10 +54,10 @@ export const PlayerCard: React.FC<PlayerCardProps> = ({ player, stats, position,
                             color: '#FFA07A', 
                             mr: 0.5
                         }}>
-                            <span role="img" aria-label="Losses">❌</span>
+                            {/* <span role="img" aria-label="Losses">❌</span>
                             <Typography variant="caption" sx={{ ml: 0.3 }}>
                                 {stats.losses.total}
-                            </Typography>
+                            </Typography> */}
                         </Box>
                         
                         {stats.losses.total > 0 && (
@@ -77,9 +79,9 @@ export const PlayerCard: React.FC<PlayerCardProps> = ({ player, stats, position,
                 <Box component="span" sx={{ color: '#90EE90', mr: 0.5 }}>
                     W:{stats.wins.total}
                 </Box>
-                <Box component="span" sx={{ color: '#FFA07A' }}>
+                {/* <Box component="span" sx={{ color: '#FFA07A' }}>
                     L:{stats.losses.total}
-                </Box>
+                </Box> */}
             </Typography>
         );
     };
